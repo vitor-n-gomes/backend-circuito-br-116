@@ -1,5 +1,5 @@
 import { Controller, Get, Query, Param } from '@nestjs/common';
-import { ApiTags, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { PaginationRequestDto } from '../dto/request/pagination.request.dto';
 import { EntityResponseDto } from '../dto/response/entity.response.dto';
 import { PaginationResponseDto } from '../dto/response/pagination.response.dto';
