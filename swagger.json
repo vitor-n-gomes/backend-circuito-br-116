@@ -1,0 +1,238 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/entities": {
+      "get": {
+        "operationId": "EntityController_listEntities",
+        "parameters": [
+          {
+            "name": "filter",
+            "required": false,
+            "in": "query",
+            "description": "Text to filter entities by name or description.",
+            "schema": {
+              "$ref": "#/components/schemas/FilterRequestDto"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination.",
+            "schema": {
+              "example": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page.",
+            "schema": {
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Entity"
+        ]
+      }
+    },
+    "/entities/{uuid}": {
+      "get": {
+        "operationId": "EntityController_getEntityByUuid",
+        "parameters": [
+          {
+            "name": "uuid",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "example": "a3f1c2e4-5b6d-7e8f-9a0b-1c2d3e4f5a6b",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Entity"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Circuito BR 116 API",
+    "description": "API documentation for Circuito BR 116",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "Home",
+      "description": ""
+    }
+  ],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "FilterRequestDto": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "example": "search term",
+            "description": "Text to filter entities by name, description or category"
+          },
+          "city": {
+            "type": "string",
+            "example": "City",
+            "description": "Text to filter entities by city"
+          }
+        }
+      },
+      "EntityResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "uuid": {
+            "type": "string",
+            "example": "a3f1c2e4-5b6d-7e8f-9a0b-1c2d3e4f5a6b"
+          },
+          "companyName": {
+            "type": "string",
+            "example": "Acme Corp"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+55 11 99999-9999"
+          },
+          "email": {
+            "type": "string",
+            "example": "contact@acme.com"
+          },
+          "address": {
+            "type": "string",
+            "example": "Av. Paulista, 1000, São Paulo, SP"
+          },
+          "logoUrl": {
+            "type": "string",
+            "example": "https://acme.com/logo.png"
+          },
+          "images": {
+            "example": [
+              "https://acme.com/image1.png",
+              "https://acme.com/image2.png"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "additionalInformation": {
+            "example": [
+              {
+                "key": "website",
+                "value": "https://acme.com"
+              },
+              {
+                "key": "founded",
+                "value": "1999"
+              }
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "category": {
+            "type": "string",
+            "example": "Transport"
+          }
+        },
+        "required": [
+          "id",
+          "uuid",
+          "companyName"
+        ]
+      },
+      "PaginationResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "List of entities for the current page.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntityResponseDto"
+            }
+          },
+          "currentPage": {
+            "type": "number",
+            "example": 1,
+            "description": "Current page number."
+          },
+          "totalElements": {
+            "type": "number",
+            "example": 100,
+            "description": "Total number of elements."
+          },
+          "nextPage": {
+            "type": "number",
+            "example": 2,
+            "description": "Next page number, or null if last page."
+          },
+          "lastPage": {
+            "type": "number",
+            "example": 10,
+            "description": "Last page number."
+          },
+          "firstPage": {
+            "type": "number",
+            "example": 1,
+            "description": "First page number."
+          },
+          "previousPage": {
+            "type": "number",
+            "example": 1,
+            "description": "Previous page number, or null if first page."
+          }
+        },
+        "required": [
+          "data",
+          "currentPage",
+          "totalElements",
+          "nextPage",
+          "lastPage",
+          "firstPage",
+          "previousPage"
+        ]
+      }
+    }
+  }
+}
