@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Entity } from "../../entity.entity";
+import { Entity } from "./models/entity.entity";
 import { IEntityRepository } from "../interfaces/entity.interface.repository";
 import { FilterRequestDto } from "../../dtos/requests/filter.request.dto";
 
@@ -12,18 +12,18 @@ export class EntityRepository implements IEntityRepository {
     private readonly entityRepo: Repository<Entity>
   ) {}
 
-  findById(id: string): Promise<any> {
-    throw new Error("Method not implemented.");
+  async findByUuid(uuid: string): Promise<Entity | null> {
+    return await this.entityRepo.findOne({
+      where: { uuid },
+    });
   }
 
   async findWithFilters(
     filters: FilterRequestDto,
     page: number,
     limit: number
-  ): Promise<{ data: any[]; total: number }> {
+  ): Promise<{ data: Entity[]; total: number }> {
     const queryBuilder = this.entityRepo.createQueryBuilder("c");
-
-    console.debug(queryBuilder.getQuery());
 
     queryBuilder.skip((page - 1) * limit).take(limit);
 

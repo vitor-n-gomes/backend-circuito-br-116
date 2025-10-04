@@ -1,11 +1,11 @@
 import { Injectable, Inject } from "@nestjs/common";
-import { EntityRepository } from "../repositories/type-orm/entity.repository";
+import { IEntityRepository } from "../repositories/interfaces/entity.interface.repository";
 
 @Injectable()
 export class FindWithFiltersCase {
   constructor(
-    @Inject(EntityRepository)
-    private readonly entityRepository: EntityRepository
+    @Inject(IEntityRepository)
+    private readonly entityRepository: IEntityRepository
   ) {}
 
   async execute(): Promise<any> {

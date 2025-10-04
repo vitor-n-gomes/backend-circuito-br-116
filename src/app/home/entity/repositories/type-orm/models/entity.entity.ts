@@ -5,6 +5,9 @@ export class Entity {
   @PrimaryGeneratedColumn({ name: "codcadastro" })
   id: number;
 
+  @Column({ name: "codcadastro" })
+  uuid: string;
+
   @Column({ name: "empresa" })
   companyName: string;
 

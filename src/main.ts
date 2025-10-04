@@ -1,7 +1,6 @@
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
-import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
@@ -11,7 +10,6 @@ dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors();
 
   const config = new DocumentBuilder()
@@ -27,7 +25,7 @@ async function bootstrap() {
 
   SwaggerModule.setup("api-docs", app, document);
 
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 8081;
   await app.listen(port);
 }
 bootstrap();
