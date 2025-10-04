@@ -1,12 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { EntityResponseDto } from "./entity.response.dto";
+import { ContactResponseDto } from "./contact.response.dto";
 
 export class PaginationResponseDto {
   @ApiProperty({
-    type: [EntityResponseDto],
+    type: [ContactResponseDto],
     description: "List of entities for the current page.",
   })
-  data: EntityResponseDto[];
+  data: ContactResponseDto[];
 
   @ApiProperty({ example: 1, description: "Current page number." })
   currentPage: number;

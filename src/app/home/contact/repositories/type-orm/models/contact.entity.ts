@@ -1,7 +1,7 @@
-import { Entity as EntityOrm, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
-@EntityOrm({ name: "cadastro" })
-export class Entity {
+@Entity({ name: "cadastro" })
+export class Contact {
   @PrimaryGeneratedColumn({ name: "codcadastro" })
   id: number;
 

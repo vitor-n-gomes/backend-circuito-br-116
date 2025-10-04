@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
-import { EntityModule } from "./entity/entity.module";
+import { ContactModule } from "./contact/contact.module";
 @Module({
-  imports: [EntityModule],
+  imports: [ContactModule],
 })
 export class HomeModule {}

@@ -3,7 +3,7 @@
   "paths": {
     "/entities": {
       "get": {
-        "operationId": "EntityController_listEntities",
+        "operationId": "ContactController_listEntities",
         "parameters": [
           {
             "name": "filter",
@@ -54,7 +54,7 @@
     },
     "/entities/{uuid}": {
       "get": {
-        "operationId": "EntityController_getEntityByUuid",
+        "operationId": "ContactController_getEntityByUuid",
         "parameters": [
           {
             "name": "uuid",
@@ -72,7 +72,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EntityResponseDto"
+                  "$ref": "#/components/schemas/ContactResponseDto"
                 }
               }
             }
@@ -114,7 +114,7 @@
           }
         }
       },
-      "EntityResponseDto": {
+      "ContactResponseDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -189,7 +189,7 @@
             "description": "List of entities for the current page.",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/EntityResponseDto"
+              "$ref": "#/components/schemas/ContactResponseDto"
             }
           },
           "currentPage": {

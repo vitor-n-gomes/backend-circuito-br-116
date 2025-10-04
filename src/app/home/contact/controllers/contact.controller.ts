@@ -1,13 +1,13 @@
 import { Controller, Get, Query, Param } from "@nestjs/common";
 import { ApiTags, ApiResponse, ApiParam } from "@nestjs/swagger";
 import { PaginationRequestDto } from "../dtos/requests/pagination.request.dto";
-import { EntityResponseDto } from "../dtos/responses/entity.response.dto";
+import { ContactResponseDto } from "../dtos/responses/contact.response.dto";
 import { PaginationResponseDto } from "../dtos/responses/pagination.response.dto";
 import { FindWithFiltersCase } from "../use-cases/find-with-filters.use-case";
 
 @ApiTags("Entity")
 @Controller("entities")
-export class EntityController {
+export class ContactController {
   constructor(private readonly useCase: FindWithFiltersCase) {}
 
   @Get("")
@@ -26,10 +26,10 @@ export class EntityController {
     type: "string",
     example: "a3f1c2e4-5b6d-7e8f-9a0b-1c2d3e4f5a6b",
   })
-  @ApiResponse({ status: 200, type: EntityResponseDto })
+  @ApiResponse({ status: 200, type: ContactResponseDto })
   async getEntityByUuid(
     @Param("uuid") uuid: string
-  ): Promise<EntityResponseDto> {
+  ): Promise<ContactResponseDto> {
     // Example stub response
     return {
       id: 1,
