@@ -4,16 +4,24 @@ import { AppModule } from "./app.module";
 import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
-
+import { ValidationPipe } from "@nestjs/common";
 dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
   app.enableCors();
-
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
   const config = new DocumentBuilder()
     .setTitle("Circuito BR 116 API")
+    .addServer('http://localhost:8081', 'Local environment')
+    .addServer('https://your-production-url.com', 'Production environment')
     .setDescription("API documentation for Circuito BR 116")
     .setVersion("1.0")
     .addTag("Home")

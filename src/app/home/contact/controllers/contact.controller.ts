@@ -1,50 +1,47 @@
-import { Controller, Get, Query, Param } from "@nestjs/common";
+import { Controller, Get, Query, Param, ValidationPipe } from "@nestjs/common";
 import { ApiTags, ApiResponse, ApiParam } from "@nestjs/swagger";
 import { PaginationRequestDto } from "../dtos/requests/pagination.request.dto";
 import { ContactResponseDto } from "../dtos/responses/contact.response.dto";
-import { PaginationResponseDto } from "../dtos/responses/pagination.response.dto";
-import { FindWithFiltersCase } from "../use-cases/find-with-filters.use-case";
+import { PaginateContactsByFilterCase} from "../use-cases/paginate-contacts-by-filter.case";
+import { PaginationResponseDto } from "@/common/utils/dtos/responses/pagination.response.dto";
+import { FindContactByIdCase } from "../use-cases/find-contact-by-id.case";
 
-@ApiTags("Entity")
-@Controller("entities")
+@ApiTags("Contact")
+@Controller("contacts")
 export class ContactController {
-  constructor(private readonly useCase: FindWithFiltersCase) {}
+  constructor(private readonly paginateContactsByFilterCase: PaginateContactsByFilterCase, private readonly findContactByIdCase: FindContactByIdCase) { }
 
-  @Get("")
-  @ApiResponse({ status: 200, type: PaginationResponseDto })
-  async listEntities(
+  @Get()
+  @ApiResponse({ status: 200, type: PaginationResponseDto<ContactResponseDto[]> })
+  async listContacts(
+    @Query('filter[city]', new ValidationPipe({ transform: true })) city: string,
+    @Query('filter[query]', new ValidationPipe({ transform: true })) query: string,
     @Query() pagination: PaginationRequestDto
-  ): Promise<PaginationResponseDto> {
-    const data = await this.useCase.execute();
+  ): Promise<PaginationResponseDto<ContactResponseDto[]>> {
+
+    pagination.filter = {
+      city,
+      query
+    }
+
+    const data = await this.paginateContactsByFilterCase.execute(pagination);
 
     return data;
   }
 
-  @Get(":uuid")
+  @Get(":id")
   @ApiParam({
-    name: "uuid",
-    type: "string",
-    example: "a3f1c2e4-5b6d-7e8f-9a0b-1c2d3e4f5a6b",
+    name: "id",
+    type: "number",
+    example: 1,
   })
   @ApiResponse({ status: 200, type: ContactResponseDto })
-  async getEntityByUuid(
-    @Param("uuid") uuid: string
+  async getContactById(
+    @Param("id") id: number
   ): Promise<ContactResponseDto> {
-    // Example stub response
-    return {
-      id: 1,
-      uuid,
-      companyName: "Acme Corp",
-      phoneNumber: "+55 11 99999-9999",
-      email: "contact@acme.com",
-      address: "Av. Paulista, 1000, São Paulo, SP",
-      logoUrl: "https://acme.com/logo.png",
-      images: ["https://acme.com/image1.png", "https://acme.com/image2.png"],
-      additionalInformation: [
-        { key: "website", value: "https://acme.com" },
-        { key: "founded", value: "1999" },
-      ],
-      category: "Transport",
-    };
+   
+    const data = await this.findContactByIdCase.execute(id);
+
+    return data;
   }
 }

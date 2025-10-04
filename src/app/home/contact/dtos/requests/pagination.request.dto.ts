@@ -1,4 +1,4 @@
-import { IsOptional, IsInt, Min, Max, IsObject } from "class-validator";
+import { IsOptional, IsInt, Min, Max, IsObject, ValidateNested } from "class-validator";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { FilterRequestDto } from "./filter.request.dto";
 
@@ -17,8 +17,8 @@ export class PaginationRequestDto {
   })
   @IsOptional()
   @IsInt()
-  @Min(0)
-  page?: number;
+  @Min(1)
+  page?: number = 1;
 
   @ApiPropertyOptional({
     example: 10,
@@ -28,5 +28,5 @@ export class PaginationRequestDto {
   @IsInt()
   @Min(1)
   @Max(100)
-  limit?: number;
+  limit?: number = 10;
 }

@@ -34,6 +34,6 @@ module.exports = {
             statements: 80,
         },
     },
-    testMatch: ['<rootDir>/src/**/*.spec.ts'],
+    testMatch: ['<rootDir>/test/**/*.spec.ts'],
     testPathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/node_modules/']
 }

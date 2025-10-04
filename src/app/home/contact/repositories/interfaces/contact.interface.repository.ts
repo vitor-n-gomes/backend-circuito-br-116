@@ -1,11 +1,11 @@
+import { PaginationResponseDto } from "@/common/utils/dtos/responses/pagination.response.dto";
 import { FilterRequestDto } from "../../dtos/requests/filter.request.dto";
-import { Contact } from "../type-orm/models/contact.entity";
-
+import { ContactResponseDto } from "../../dtos/responses/contact.response.dto";
 export abstract class IContactRepository {
-  abstract findByUuid(uuid: string): Promise<any>;
+  abstract findById(id: number): Promise<ContactResponseDto | null>;
   abstract findWithFilters(
     filters: FilterRequestDto,
     page: number,
     limit: number
-  ): Promise<{ data: Contact[]; total: number }>;
+  ): Promise<PaginationResponseDto<ContactResponseDto[]>>;
 }
