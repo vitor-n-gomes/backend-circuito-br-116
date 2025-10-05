@@ -25,7 +25,12 @@ module.exports = {
     clearMocks: true,
     collectCoverage: true,
     coverageDirectory: 'coverage',
-    collectCoverageFrom: ['src/**/*.ts'],
+    collectCoverageFrom: [
+        'src/**/*.ts',
+        '!src/**/*.dto.ts',
+        '!src/**/*.module.ts',
+        '!src/main.ts'
+    ],
     coverageThreshold: {
         global: {
             branches: 80,
@@ -34,6 +39,12 @@ module.exports = {
             statements: 80,
         },
     },
-    testMatch: ['<rootDir>/src/**/*.spec.ts'],
-    testPathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/node_modules/']
+    testMatch: ['<rootDir>/test/**/*.spec.ts'],
+    testPathIgnorePatterns: [
+        '<rootDir>/dist/',
+        '<rootDir>/node_modules/',
+        '<rootDir>/src/.*\\.dto\\.ts$',
+        '<rootDir>/src/.*\\.module\\.ts$',
+        '<rootDir>/src/main.ts$'
+    ]
 }

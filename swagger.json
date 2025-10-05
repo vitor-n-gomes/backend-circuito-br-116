@@ -1,10 +1,26 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/entities": {
+    "/contacts": {
       "get": {
-        "operationId": "EntityController_listEntities",
+        "operationId": "ContactController_listContacts",
         "parameters": [
+          {
+            "name": "filter[city]",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter[query]",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "filter",
             "required": false,
@@ -48,21 +64,21 @@
           }
         },
         "tags": [
-          "Entity"
+          "Contact"
         ]
       }
     },
-    "/entities/{uuid}": {
+    "/contacts/{id}": {
       "get": {
-        "operationId": "EntityController_getEntityByUuid",
+        "operationId": "ContactController_getContactById",
         "parameters": [
           {
-            "name": "uuid",
+            "name": "id",
             "required": true,
             "in": "path",
             "schema": {
-              "example": "a3f1c2e4-5b6d-7e8f-9a0b-1c2d3e4f5a6b",
-              "type": "string"
+              "example": 1,
+              "type": "number"
             }
           }
         ],
@@ -72,14 +88,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EntityResponseDto"
+                  "$ref": "#/components/schemas/ContactResponseDto"
                 }
               }
             }
           }
         },
         "tags": [
-          "Entity"
+          "Contact"
         ]
       }
     }
@@ -96,7 +112,16 @@
       "description": ""
     }
   ],
-  "servers": [],
+  "servers": [
+    {
+      "url": "http://localhost:8081",
+      "description": "Local environment"
+    },
+    {
+      "url": "https://your-production-url.com",
+      "description": "Production environment"
+    }
+  ],
   "components": {
     "schemas": {
       "FilterRequestDto": {
@@ -114,7 +139,58 @@
           }
         }
       },
-      "EntityResponseDto": {
+      "PaginationResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "List of entities for the current page.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "currentPage": {
+            "type": "number",
+            "example": 1,
+            "description": "Current page number."
+          },
+          "totalElements": {
+            "type": "number",
+            "example": 100,
+            "description": "Total number of elements."
+          },
+          "nextPage": {
+            "type": "number",
+            "example": 2,
+            "description": "Next page number, or null if last page."
+          },
+          "lastPage": {
+            "type": "number",
+            "example": 10,
+            "description": "Last page number."
+          },
+          "firstPage": {
+            "type": "number",
+            "example": 1,
+            "description": "First page number."
+          },
+          "previousPage": {
+            "type": "number",
+            "example": 1,
+            "description": "Previous page number, or null if first page."
+          }
+        },
+        "required": [
+          "data",
+          "currentPage",
+          "totalElements",
+          "nextPage",
+          "lastPage",
+          "firstPage",
+          "previousPage"
+        ]
+      },
+      "ContactResponseDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -122,7 +198,7 @@
             "example": 1
           },
           "uuid": {
-            "type": "string",
+            "type": "number",
             "example": "a3f1c2e4-5b6d-7e8f-9a0b-1c2d3e4f5a6b"
           },
           "companyName": {
@@ -180,57 +256,6 @@
           "id",
           "uuid",
           "companyName"
-        ]
-      },
-      "PaginationResponseDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "description": "List of entities for the current page.",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EntityResponseDto"
-            }
-          },
-          "currentPage": {
-            "type": "number",
-            "example": 1,
-            "description": "Current page number."
-          },
-          "totalElements": {
-            "type": "number",
-            "example": 100,
-            "description": "Total number of elements."
-          },
-          "nextPage": {
-            "type": "number",
-            "example": 2,
-            "description": "Next page number, or null if last page."
-          },
-          "lastPage": {
-            "type": "number",
-            "example": 10,
-            "description": "Last page number."
-          },
-          "firstPage": {
-            "type": "number",
-            "example": 1,
-            "description": "First page number."
-          },
-          "previousPage": {
-            "type": "number",
-            "example": 1,
-            "description": "Previous page number, or null if first page."
-          }
-        },
-        "required": [
-          "data",
-          "currentPage",
-          "totalElements",
-          "nextPage",
-          "lastPage",
-          "firstPage",
-          "previousPage"
         ]
       }
     }
