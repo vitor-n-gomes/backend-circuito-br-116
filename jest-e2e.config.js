@@ -19,6 +19,7 @@ module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'node',
     moduleNameMapper: makeModuleNameMapper('./tsconfig.json'),
+    setupFiles: ["<rootDir>/jest-e2e.setup.js"],
     modulePathIgnorePatterns: ['<rootDir>/dist/', '<rootDir>/node_modules/'],
     resetMocks: true,
     restoreMocks: true,

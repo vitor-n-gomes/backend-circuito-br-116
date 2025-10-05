@@ -1,4 +1,4 @@
-import { toObjectResponseMapper } from "@/app/infra/repositories/mappers/to-object-response.mapper";
+import { toObjectResponseMapper } from "@/app/infra/repositories/type-orm/mappers/to-object-response.mapper";
 
 class TestDTO {
   id: number;
