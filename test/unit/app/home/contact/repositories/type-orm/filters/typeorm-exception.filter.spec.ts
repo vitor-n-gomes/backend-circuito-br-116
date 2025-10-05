@@ -1,4 +1,4 @@
-import { TypeOrmExceptionFilter } from "@/app/home/contact/repositories/type-orm/filters/typeorm-exception.filter";
+import { TypeOrmExceptionFilter } from "@/app/infra/repositories/type-orm/filters/typeorm-exception.filter";
 import { QueryFailedError, EntityNotFoundError } from "typeorm";
 import { ArgumentsHost, HttpStatus } from "@nestjs/common";
 

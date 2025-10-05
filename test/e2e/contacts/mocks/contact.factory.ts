@@ -1,4 +1,4 @@
-import { Contact } from "@/app/home/contact/repositories/type-orm/models/contact.entity";
+import { Contact } from "@/app/infra/repositories/type-orm/models/contact.entity";
 import { contactList } from "./contact-list.mock";
 
 export const ContactFactory = (): Contact[] => {

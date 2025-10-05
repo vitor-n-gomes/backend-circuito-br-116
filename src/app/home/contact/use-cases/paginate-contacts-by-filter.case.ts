@@ -1,8 +1,8 @@
 import { Injectable, Inject } from "@nestjs/common";
-import { IContactRepository } from "../repositories/interfaces/contact.interface.repository";
 import { PaginationRequestDto } from "../dtos/requests/pagination.request.dto";
 import { ContactResponseDto } from "../dtos/responses/contact.response.dto";
 import { PaginationResponseDto } from "@/common/utils/dtos/responses/pagination.response.dto";
+import { IContactRepository } from "@/app/infra/repositories/interfaces/contact.interface.repository";
 
 @Injectable()
 export class PaginateContactsByFilterCase {

@@ -1,5 +1,5 @@
 import { FindContactByIdCase } from "@/app/home/contact/use-cases/find-contact-by-id.case";
-import { IContactRepository } from "@/app/home/contact/repositories/interfaces/contact.interface.repository";
+import { IContactRepository } from "@/app/infra/repositories/interfaces/contact.interface.repository";
 import { ContactResponseDto } from "@/app/home/contact/dtos/responses/contact.response.dto";
 import { SingleContactFactory } from "../mocks/contact.factory";
 

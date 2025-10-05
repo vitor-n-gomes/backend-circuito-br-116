@@ -3,11 +3,11 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Contact } from "./models/contact.entity";
 import { IContactRepository } from "../interfaces/contact.interface.repository";
-import { FilterRequestDto } from "../../dtos/requests/filter.request.dto";
+import { FilterRequestDto } from "../../../home/contact/dtos/requests/filter.request.dto";
 import { PaginationResponseDto } from "@/common/utils/dtos/responses/pagination.response.dto";
-import { ContactResponseDto } from "../../dtos/responses/contact.response.dto";
 import { toPaginationResponseMapper } from "../mappers/to-pagination-response.mapper";
 import { toObjectResponseMapper } from "../mappers/to-object-response.mapper";
+import { ContactResponseDto } from "@/app/home/contact/dtos/responses/contact.response.dto";
 
 @Injectable()
 export class ContactRepository implements IContactRepository {

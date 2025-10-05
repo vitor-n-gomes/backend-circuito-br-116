@@ -1,4 +1,4 @@
-import { toPaginationResponseMapper } from "@/app/home/contact/repositories/mappers/to-pagination-response.mapper";
+import { toPaginationResponseMapper } from "@/app/infra/repositories/mappers/to-pagination-response.mapper";
 
 class TestDTO {
   id: number;

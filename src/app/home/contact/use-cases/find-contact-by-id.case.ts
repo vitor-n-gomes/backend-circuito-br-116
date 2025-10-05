@@ -1,6 +1,6 @@
 import { Injectable, Inject } from "@nestjs/common";
-import { IContactRepository } from "../repositories/interfaces/contact.interface.repository";
 import { ContactResponseDto } from "../dtos/responses/contact.response.dto";
+import { IContactRepository } from "@/app/infra/repositories/interfaces/contact.interface.repository";
 
 @Injectable()
 export class FindContactByIdCase {

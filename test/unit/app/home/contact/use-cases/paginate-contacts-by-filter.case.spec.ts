@@ -1,5 +1,5 @@
 import { PaginateContactsByFilterCase } from "@/app/home/contact/use-cases/paginate-contacts-by-filter.case";
-import { IContactRepository } from "@/app/home/contact/repositories/interfaces/contact.interface.repository";
+import { IContactRepository } from "@/app/infra/repositories/interfaces/contact.interface.repository";
 import { PaginationRequestDto } from "@/app/home/contact/dtos/requests/pagination.request.dto";
 import { ContactResponseDto } from "@/app/home/contact/dtos/responses/contact.response.dto";
 import { PaginationResponseDto } from "@/common/utils/dtos/responses/pagination.response.dto";
