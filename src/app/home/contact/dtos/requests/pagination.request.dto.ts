@@ -1,4 +1,11 @@
-import { IsOptional, IsInt, Min, Max, IsObject, ValidateNested } from "class-validator";
+import {
+  IsOptional,
+  IsInt,
+  Min,
+  Max,
+  IsObject,
+  ValidateNested,
+} from "class-validator";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { FilterRequestDto } from "./filter.request.dto";
 

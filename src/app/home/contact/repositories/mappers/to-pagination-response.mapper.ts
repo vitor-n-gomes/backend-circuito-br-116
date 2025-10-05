@@ -8,14 +8,11 @@ export function toPaginationResponseMapper<T, D extends object>(
   limit: number,
   dtoClass: new () => T
 ): PaginationResponseDto<T[]> {
-
   const lastPage = Math.ceil(total / limit);
   const nextPage = page < lastPage ? page + 1 : null;
   const previousPage = page > 1 ? page - 1 : null;
 
-  const mappedData: T[] = data.map((item) =>
-    plainToInstance(dtoClass, item)
-  );
+  const mappedData: T[] = data.map((item) => plainToInstance(dtoClass, item));
 
   return {
     data: mappedData,

@@ -16,12 +16,12 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
-    }),
+    })
   );
   const config = new DocumentBuilder()
     .setTitle("Circuito BR 116 API")
-    .addServer('http://localhost:8081', 'Local environment')
-    .addServer('https://your-production-url.com', 'Production environment')
+    .addServer("http://localhost:8081", "Local environment")
+    .addServer("https://your-production-url.com", "Production environment")
     .setDescription("API documentation for Circuito BR 116")
     .setVersion("1.0")
     .addTag("Home")

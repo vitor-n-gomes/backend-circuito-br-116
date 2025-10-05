@@ -5,7 +5,7 @@ export class ContactResponseDto {
   id: number;
 
   @ApiProperty({ example: "a3f1c2e4-5b6d-7e8f-9a0b-1c2d3e4f5a6b" })
-  uuid: string;
+  uuid: number;
 
   @ApiProperty({ example: "Acme Corp" })
   companyName: string;

@@ -7,10 +7,9 @@ export class FindContactByIdCase {
   constructor(
     @Inject(IContactRepository)
     private readonly entityRepository: IContactRepository
-  ) { }
+  ) {}
 
   async execute(id: number): Promise<ContactResponseDto> {
-
     const data = await this.entityRepository.findById(id);
 
     return data;

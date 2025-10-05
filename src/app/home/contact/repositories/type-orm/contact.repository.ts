@@ -14,7 +14,7 @@ export class ContactRepository implements IContactRepository {
   constructor(
     @InjectRepository(Contact)
     private readonly contactRepo: Repository<Contact>
-  ) { }
+  ) {}
 
   async findById(id: number): Promise<ContactResponseDto | null> {
     const contact = await this.contactRepo.findOne({ where: { id } });
@@ -29,7 +29,7 @@ export class ContactRepository implements IContactRepository {
     const queryBuilder = this.contactRepo.createQueryBuilder("c");
 
     queryBuilder.andWhere("nivel < :level", {
-      level: 'z',
+      level: "z",
     });
 
     if (filters.query) {
@@ -54,6 +54,12 @@ export class ContactRepository implements IContactRepository {
 
     const [data, total] = await queryBuilder.getManyAndCount();
 
-    return toPaginationResponseMapper(data, total, page, limit, ContactResponseDto);
+    return toPaginationResponseMapper(
+      data,
+      total,
+      page,
+      limit,
+      ContactResponseDto
+    );
   }
 }

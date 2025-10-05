@@ -11,9 +11,14 @@ export class PaginateContactsByFilterCase {
     private readonly entityRepository: IContactRepository
   ) {}
 
-  async execute(pagination: PaginationRequestDto): Promise<PaginationResponseDto<ContactResponseDto[]>> {
-    
-    const data = await this.entityRepository.findWithFilters(pagination.filter, pagination.page, pagination.limit);
+  async execute(
+    pagination: PaginationRequestDto
+  ): Promise<PaginationResponseDto<ContactResponseDto[]>> {
+    const data = await this.entityRepository.findWithFilters(
+      pagination.filter,
+      pagination.page,
+      pagination.limit
+    );
 
     return data;
   }

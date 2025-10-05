@@ -3,9 +3,9 @@ import {
   Catch,
   ArgumentsHost,
   HttpStatus,
-} from '@nestjs/common';
-import { Response } from 'express';
-import { QueryFailedError, EntityNotFoundError } from 'typeorm';
+} from "@nestjs/common";
+import { Response } from "express";
+import { QueryFailedError, EntityNotFoundError } from "typeorm";
 
 @Catch(QueryFailedError, EntityNotFoundError)
 export class TypeOrmExceptionFilter implements ExceptionFilter {
@@ -14,7 +14,7 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Database error occurred';
+    let message = "Database error occurred";
 
     if (exception instanceof QueryFailedError) {
       status = HttpStatus.BAD_REQUEST;
@@ -23,7 +23,7 @@ export class TypeOrmExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof EntityNotFoundError) {
       status = HttpStatus.NOT_FOUND;
-      message = 'Entity not found';
+      message = "Entity not found";
     }
 
     response.status(status).json({
