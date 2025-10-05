@@ -1,87 +1,106 @@
-# Circuito BR 116 
+# Circuito BR 116 Backend API
 
-This project is a backend application built using the **NestJS** framework. It adheres to the SOLID principles and provides functionality to analyze and manage movie data, including identifying producers with the shortest and longest intervals between Golden Raspberry Awards.
+Backend service for the Circuito BR 116 website, built with NestJS. This modern API replaces the legacy infrastructure and provides a robust foundation for the platform's services.
+
+## Tech Stack
+
+- **Framework:** NestJS (TypeScript)
+- **Database:** MySQL 8.0
+- **Testing:** Jest
+- **Documentation:** Swagger/OpenAPI 
+- **Code Coverage:** Istanbul
+- **Node Version:** v21 or higher
+
+## Project Structure
+
+```
+src/
+├── app/            # Domain logic and business modules
+├── common/         # Shared utilities and helpers
+├── errors/         # Custom error definitions
+├── filters/        # Global exception filters
+└── main.ts        # Application entry point
+```
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) (v21 or higher)
-- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+- Node.js (v21+)
+- npm or yarn
+- MySQL (version 8.0 or higher)
 
-## Installation
+## Getting Started
 
-1. Clone the repository:
+1. **Clone the repository**
    ```bash
    git clone https://github.com/vitor-n-gomes/backend-circuito-br-116.git
    cd backend-circuito-br-116
    ```
 
-2. Install dependencies:
+2. **Install dependencies**
    ```bash
    npm install
    # or
    yarn install
    ```
 
-3. Set up environment variables:
-   Copy the `env.example` file to `.env` and configure the necessary variables:
+3. **Environment Setup**
    ```bash
    cp env.example .env
    ```
+   Configure the following variables in `.env`:
+   - `HOST`: API host (default: 127.0.0.1)
+   - `PORT`: API port (default: 8081)
+   - `NODE_ENV`: Environment (development/production)
+   - `DB_HOST`: MySQL server host
+   - `DB_PORT`: MySQL server port (default: 3306)
+   - `DB_USER`: MySQL username
+   - `DB_PASS`: MySQL password
+   - `DB_NAME`: MySQL database name
 
-   Update the `.env` file with your specific configuration.
+## Development
 
-## Running the Application
-
-### Development Mode
 ```bash
+# Development mode with hot-reload
 npm run start:dev
-# or
-yarn start:dev
-```
 
-### Production Mode
-```bash
+# Production build
 npm run build
 npm run start:prod
-# or
-yarn build
-yarn start:prod
 ```
 
-### Running Tests
-Run unit tests:
+## Testing
+
 ```bash
+# Unit tests
 npm run test
-# or
-yarn test
-```
 
-Run end-to-end tests:
-```bash
+# E2E tests
 npm run test:e2e
-# or
-yarn test:e2e
-```
 
-Check test coverage:
-```bash
+# Test coverage
 npm run test:cov
-# or
-yarn test:cov
 ```
 
-## Accessing the API
+## API Documentation
 
-Once the application is running, you can access the API at the following URL:
+- API documentation is available via Swagger
+- Access the Swagger UI at: `http://{HOST}:{PORT}/api-docs`
+- OpenAPI specification: `swagger.json`
 
-- **Base URL**: `http://localhost:3000`
+## Error Handling
 
-You can use tools like [Postman](https://www.postman.com/) or [cURL](https://curl.se/) to interact with the API.
+The application implements a global exception filter and custom error classes for consistent error responses:
+- Custom errors are defined in `src/common/errors/`
+- Global exception handling in `src/common/filters/http-exception.filter.ts`
 
-## Code Coverage
+## Contributing
 
-The project uses **Istanbul** for code coverage. Coverage reports can be found in the `coverage/` directory after running the coverage command.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
