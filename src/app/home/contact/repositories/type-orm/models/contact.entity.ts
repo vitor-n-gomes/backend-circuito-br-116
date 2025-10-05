@@ -6,7 +6,7 @@ export class Contact {
   id: number;
 
   @Column({ name: "codcadastro" })
-  uuid: string;
+  uuid: number;
 
   @Column({ name: "empresa" })
   companyName: string;

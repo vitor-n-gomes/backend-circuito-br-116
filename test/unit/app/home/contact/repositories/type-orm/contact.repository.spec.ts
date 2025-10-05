@@ -4,8 +4,8 @@ import { Repository } from "typeorm";
 import { ContactRepository } from "@/app/home/contact/repositories/type-orm/contact.repository";
 import { Contact } from "@/app/home/contact/repositories/type-orm/models/contact.entity";
 import { FilterRequestDto } from "@/app/home/contact/dtos/requests/filter.request.dto";
-import { SingleContactFactory } from "./mocks/contact.factory";
-import { expectedResultContactList } from "./mocks/contact-result.mock";
+import { SingleContactFactory } from "../../mocks/contact.factory";
+import { expectedResultContactList } from "../../mocks/contact-result.mock";
 
 describe("ContactRepository", () => {
   let repository: ContactRepository;
