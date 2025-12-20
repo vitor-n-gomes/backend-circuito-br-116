@@ -2,8 +2,11 @@ import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { ContactRepository } from "./contact.repository";
 import { IContactRepository } from "../interfaces/contact.interface.repository";
+import { BusinessRepository } from "./business.repository";
+import { IBusinessRepository } from "../interfaces/business.interface.repository";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Contact } from "./models/contact.entity";
+import { Business } from "./models/business.entity";
 
 @Module({
   imports: [
@@ -25,14 +28,18 @@ import { Contact } from "./models/contact.entity";
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Contact])
+    TypeOrmModule.forFeature([Contact, Business])
   ],
   providers: [
     {
       provide: IContactRepository,
       useClass: ContactRepository,
     },
+    {
+      provide: IBusinessRepository,
+      useClass: BusinessRepository,
+    },
   ],
-  exports: [IContactRepository],
+  exports: [IContactRepository, IBusinessRepository],
 })
 export class TypeOrmRepositoryModule { }
