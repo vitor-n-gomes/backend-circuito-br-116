@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Asset } from './asset.entity';
+import { Business } from './business.entity';
 
 @Entity('categories')
 export class Category {
@@ -7,9 +9,6 @@ export class Category {
 
   @Column({ type: 'uuid', default: () => 'gen_random_uuid()', unique: true })
   id: string;
-
-  @Column({ name: 'parentCategoryId', type: 'uuid', nullable: true })
-  parentCategoryId: string;
 
   @Column({ type: 'jsonb' })
   name: Record<string, string>;
@@ -35,7 +34,10 @@ export class Category {
   @UpdateDateColumn({ name: 'updatedAt' })
   updatedAt: Date;
 
-  @ManyToOne(() => Category, { nullable: true })
-  @JoinColumn({ name: 'parentCategoryId' })
-  parentCategory: Category;
+  @OneToOne(() => Asset, { nullable: true })
+  @JoinColumn({ name: 'assetId' })
+  asset: Asset;
+
+  @OneToMany(() => Business, (business) => business.category)
+  businesses: Business[];
 }

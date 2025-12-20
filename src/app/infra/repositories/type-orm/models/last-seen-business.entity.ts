@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Account } from './account.entity';
 
 @Entity('last_seen_businesses')
 export class LastSeenBusiness {
@@ -22,4 +23,8 @@ export class LastSeenBusiness {
 
   @UpdateDateColumn({ name: 'updatedAt' })
   updatedAt: Date;
+
+  @ManyToOne(() => Account, (account) => account.lastSeenBusinesses)
+  @JoinColumn({ name: 'accountId' })
+  account: Account;
 }

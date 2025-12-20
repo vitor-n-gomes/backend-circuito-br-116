@@ -1,4 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Business } from './business.entity';
+import { Comment } from './comment.entity';
+import { LastSeenBusiness } from './last-seen-business.entity';
+import { SearchHistory } from './search-history.entity';
 
 @Entity('accounts')
 export class Account {
@@ -92,7 +96,19 @@ export class Account {
   // Virtual field for raw email (will be handled in the repository)
   rawEmail?: string;
 
-  // Relations placeholders
+  // Relations
   asset?: any;
   selectedCurrency?: any;
+
+  @OneToMany(() => Business, (business) => business.account)
+  businesses: Business[];
+
+  @OneToMany(() => Comment, (comment) => comment.account)
+  comments: Comment[];
+
+  @OneToMany(() => LastSeenBusiness, (lastSeen) => lastSeen.account)
+  lastSeenBusinesses: LastSeenBusiness[];
+
+  @OneToMany(() => SearchHistory, (searchHistory) => searchHistory.account)
+  searchHistories: SearchHistory[];
 }

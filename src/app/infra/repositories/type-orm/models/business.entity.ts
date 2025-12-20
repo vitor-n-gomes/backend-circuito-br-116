@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Account } from './account.entity';
+import { Category } from './category.entity';
 
 @Entity('businesses')
 export class Business {
@@ -73,4 +75,12 @@ export class Business {
 
   @UpdateDateColumn({ name: 'updatedAt' })
   updatedAt: Date;
+
+  @ManyToOne(() => Account, (account) => account.businesses)
+  @JoinColumn({ name: 'accountId' })
+  account: Account;
+
+  @ManyToOne(() => Category, (category) => category.businesses)
+  @JoinColumn({ name: 'category_id' })
+  category: Category;
 }

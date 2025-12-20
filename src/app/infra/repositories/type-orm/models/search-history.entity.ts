@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Account } from './account.entity';
 
 @Entity('search_history')
 export class SearchHistory {
@@ -25,4 +26,8 @@ export class SearchHistory {
 
   @UpdateDateColumn({ name: 'updatedAt' })
   updatedAt: Date;
+
+  @ManyToOne(() => Account, (account) => account.searchHistories)
+  @JoinColumn({ name: 'accountId' })
+  account: Account;
 }

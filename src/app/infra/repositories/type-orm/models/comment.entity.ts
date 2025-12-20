@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Account } from './account.entity';
 
 @Entity('comments')
 export class Comment {
@@ -32,4 +33,8 @@ export class Comment {
   @ManyToOne(() => Comment, { nullable: true })
   @JoinColumn({ name: 'parentCommentId' })
   parentComment: Comment;
+
+  @ManyToOne(() => Account, (account) => account.comments)
+  @JoinColumn({ name: 'accountId' })
+  account: Account;
 }
