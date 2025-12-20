@@ -1,6 +1,5 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { ContactRepository } from "./contact.repository";
 import { IContactRepository } from "../interfaces/contact.interface.repository";
 import { BusinessRepository } from "./business.repository";
 import { IBusinessRepository } from "../interfaces/business.interface.repository";
@@ -19,7 +18,6 @@ import { ILastSeenBusinessRepository } from "../interfaces/last-seen-business.in
 import { AccountRepository } from "./account.repository";
 import { IAccountRepository } from "../interfaces/account.interface.repository";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { Contact } from "./models/contact.entity";
 import { Business } from "./models/business.entity";
 import { Category } from "./models/category.entity";
 import { Location } from "./models/location.entity";
@@ -51,7 +49,6 @@ import { Account } from "./models/account.entity";
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([
-      Contact,
       Business,
       Category,
       Location,
@@ -64,10 +61,6 @@ import { Account } from "./models/account.entity";
     ])
   ],
   providers: [
-    {
-      provide: IContactRepository,
-      useClass: ContactRepository,
-    },
     {
       provide: IBusinessRepository,
       useClass: BusinessRepository,
