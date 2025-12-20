@@ -55,8 +55,6 @@ export class CategoryRepository implements ICategoryRepository {
   }
 
   async delete(id: string): Promise<void> {
-    // Delete subcategories first
-    await this.categoryRepo.delete({ parentCategoryId: id });
     // Delete the category
     await this.categoryRepo.delete({ id });
   }
