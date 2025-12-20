@@ -53,21 +53,17 @@ export class AccountRepository implements IAccountRepository {
       identities,
       phone,
       allowedNotifications: {
-        NEW_BID_ON_AUCTION: true,
-        AUCTION_UPDATED: true,
-        BID_REMOVED_ON_AUCTION: false,
-        BID_ACCEPTED_ON_AUCTION: true,
-        BID_REJECTED_ON_AUCTION: true,
+        NEW_COMMENT_ON_BUSINESS: true,
+        BUSINESS_UPDATED: true,
+        COMMENT_REPLY: true,
         REVIEW_RECEIVED: true,
         NEW_MESSAGE: true,
         SYSTEM: true,
-        SOMEONE_ELSE_ADDED_BID_TO_SAME_AUCTION: true,
-        BID_WAS_SEEN: true,
         NEW_FOLLOWER: true,
-        AUCTION_FROM_FAVOURITES_HAS_BID: true,
-        NEW_AUCTION_FROM_FOLLOWING: true,
-        AUCTION_ADDED_TO_FAVOURITES: true,
-        FAVOURITE_AUCTION_PRICE_CHANGE: true,
+        BUSINESS_FROM_FAVOURITES_UPDATED: true,
+        NEW_BUSINESS_FROM_FOLLOWING: true,
+        BUSINESS_ADDED_TO_FAVOURITES: true,
+        FAVOURITE_BUSINESS_UPDATED: true,
       },
     });
 
@@ -100,15 +96,25 @@ export class AccountRepository implements IAccountRepository {
   }
 
   async getStats(accountId: string): Promise<AccountStatsDto> {
-    // This would need Business and Bid entities to be properly implemented
-    // For now, returning a basic structure
+    const account = await this.repository.findOne({
+      where: { id: accountId },
+      relations: ['businesses', 'comments', 'searchHistories', 'lastSeenBusinesses'],
+    });
+
+    if (!account) {
+      return {
+        businesses: 0,
+        comments: 0,
+        searchHistory: 0,
+        lastSeenBusinesses: 0,
+      };
+    }
+
     return {
-      auctions: 0,
-      bids: 0,
-      acceptedBids: 0,
-      rejectedBids: 0,
-      activeAuctions: 0,
-      closedAuctions: 0,
+      businesses: account.businesses?.length || 0,
+      comments: account.comments?.length || 0,
+      searchHistory: account.searchHistories?.length || 0,
+      lastSeenBusinesses: account.lastSeenBusinesses?.length || 0,
     };
   }
 
@@ -216,6 +222,6 @@ export class AccountRepository implements IAccountRepository {
   private generateAnonymousEmail(): string {
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 10000);
-    return `anonymous_${timestamp}_${random}@biddo.app`;
+    return `anonymous_${timestamp}_${random}@circuitobr116.com.br`;
   }
 }

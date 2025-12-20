@@ -3,12 +3,10 @@ import { CreateAccountDto } from '../../../home/accounts/dtos/requests/create-ac
 import { UpdateAccountDto } from '../../../home/accounts/dtos/requests/update-account.dto';
 
 export interface AccountStatsDto {
-  auctions: number;
-  bids: number;
-  acceptedBids: number;
-  rejectedBids: number;
-  activeAuctions: number;
-  closedAuctions: number;
+  businesses: number;
+  comments: number;
+  searchHistory: number;
+  lastSeenBusinesses: number;
 }
 
 export interface AccountExtraDetailsDto {
@@ -16,7 +14,7 @@ export interface AccountExtraDetailsDto {
   followingCount: number;
   reviewsCount: number;
   reviewsAverage: number;
-  activeAuctionsCount: number;
+  activeBusinessesCount: number;
 }
 
 export abstract class IAccountRepository {
