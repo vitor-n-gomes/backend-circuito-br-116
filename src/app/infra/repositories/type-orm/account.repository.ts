@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource, In } from 'typeorm';
-import { IAccountRepository, AccountStatsDto, AccountExtraDetailsDto } from '../interfaces/account.interface.repository';
+import { Repository, DataSource } from 'typeorm';
+import { IAccountRepository, AccountStatsDto } from '../interfaces/account.interface.repository';
 import { Account } from './models/account.entity';
 import { AccountResponseDto } from '../../../home/accounts/dtos/responses/account.response.dto';
 import { CreateAccountDto } from '../../../home/accounts/dtos/requests/create-account.dto';
