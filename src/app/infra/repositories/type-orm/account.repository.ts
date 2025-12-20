@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository } from 'typeorm';
 import { IAccountRepository, AccountStatsDto } from '../interfaces/account.interface.repository';
 import { Account } from './models/account.entity';
 import { AccountResponseDto } from '../../../home/accounts/dtos/responses/account.response.dto';
@@ -12,14 +12,13 @@ import { toObjectResponseMapper } from './mappers/to-object-response.mapper';
 export class AccountRepository implements IAccountRepository {
   constructor(
     @InjectRepository(Account)
-    private readonly repository: Repository<Account>,
-    private readonly dataSource: DataSource
+    private readonly repository: Repository<Account>
   ) {}
 
   async findById(id: string): Promise<AccountResponseDto | null> {
     const entity = await this.repository.findOne({
       where: { id },
-      relations: ['asset', 'selectedCurrency'],
+      relations: ['asset'],
     });
     return entity ? toObjectResponseMapper(entity, AccountResponseDto) : null;
   }
@@ -27,7 +26,7 @@ export class AccountRepository implements IAccountRepository {
   async findByAuthId(authId: string): Promise<AccountResponseDto | null> {
     const entity = await this.repository.findOne({
       where: { authId },
-      relations: ['asset', 'selectedCurrency'],
+      relations: ['asset'],
     });
     return entity ? toObjectResponseMapper(entity, AccountResponseDto) : null;
   }
