@@ -20,6 +20,11 @@ export class CreateBusinessDto {
   @MaxLength(100)
   locationPretty: string;
 
+  @ApiProperty({ description: 'Location ID', example: 1, required: false })
+  @IsNumber()
+  @IsOptional()
+  locationId?: number;
+
   @ApiProperty({ description: 'Latitude coordinate', example: -23.5505 })
   @IsNumber()
   @IsNotEmpty()

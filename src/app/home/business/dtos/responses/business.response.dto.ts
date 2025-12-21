@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class BusinessResponseDto {
   @ApiProperty({ description: 'Business ID', example: 1 })
-  aux_id: number;
+  auxId: number;
 
   @ApiProperty({ description: 'Business UUID', example: '123e4567-e89b-12d3-a456-426614174000' })
   id: string;
@@ -59,7 +59,7 @@ export class BusinessResponseDto {
   tiktok: string;
 
   @ApiProperty({ description: 'Category ID', example: 1 })
-  category_id: number;
+  categoryId: number;
 
   @ApiProperty({ description: 'Classification code', example: 'A1' })
   classification: string;

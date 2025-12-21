@@ -19,7 +19,7 @@ export class BusinessRepository implements IBusinessRepository {
   ) {}
 
   async findById(id: number): Promise<BusinessResponseDto | null> {
-    const business = await this.businessRepo.findOne({ where: { aux_id: id } });
+    const business = await this.businessRepo.findOne({ where: { auxId: id } });
     return toObjectResponseMapper(business, BusinessResponseDto);
   }
 
@@ -125,13 +125,13 @@ export class BusinessRepository implements IBusinessRepository {
   }
 
   async update(id: number, data: UpdateBusinessDto): Promise<BusinessResponseDto> {
-    await this.businessRepo.update({ aux_id: id }, data);
-    const updated = await this.businessRepo.findOne({ where: { aux_id: id } });
+    await this.businessRepo.update({ auxId: id }, data);
+    const updated = await this.businessRepo.findOne({ where: { auxId: id } });
     return toObjectResponseMapper(updated, BusinessResponseDto);
   }
 
   async delete(id: number): Promise<void> {
-    await this.businessRepo.delete({ aux_id: id });
+    await this.businessRepo.delete({ auxId: id });
   }
 
   async search(
@@ -241,11 +241,11 @@ export class BusinessRepository implements IBusinessRepository {
   }
 
   async incrementViews(id: number): Promise<void> {
-    await this.businessRepo.increment({ aux_id: id }, 'views', 1);
+    await this.businessRepo.increment({ auxId: id }, 'views', 1);
   }
 
   async promote(id: number): Promise<void> {
-    await this.businessRepo.update({ aux_id: id }, { promotedAt: new Date() });
+    await this.businessRepo.update({ auxId: id }, { promotedAt: new Date() });
   }
 
   async countByAccountId(accountId: number): Promise<number> {

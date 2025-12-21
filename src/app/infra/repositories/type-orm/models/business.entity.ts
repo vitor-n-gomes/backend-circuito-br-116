@@ -4,8 +4,8 @@ import { Category } from './category.entity';
 
 @Entity('businesses')
 export class Business {
-  @PrimaryGeneratedColumn()
-  aux_id: number;
+  @PrimaryGeneratedColumn({name: 'aux_id' })
+  auxId: number;
 
   @Column({ type: 'uuid', default: () => 'gen_random_uuid()' })
   id: string;
