@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 
 export class BusinessResponseDto {
   @ApiProperty({ description: 'Business ID', example: 1 })
@@ -59,6 +60,7 @@ export class BusinessResponseDto {
   tiktok: string;
 
   @ApiProperty({ description: 'Category ID', example: 1 })
+  @Expose({ name: 'category_id' })
   categoryId: number;
 
   @ApiProperty({ description: 'Classification code', example: 'A1' })
