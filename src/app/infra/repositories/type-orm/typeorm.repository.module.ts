@@ -1,6 +1,5 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { IContactRepository } from "../interfaces/contact.interface.repository";
 import { BusinessRepository } from "./business.repository";
 import { IBusinessRepository } from "../interfaces/business.interface.repository";
 import { CategoryRepository } from "./category.repository";
@@ -95,7 +94,6 @@ import { Account } from "./models/account.entity";
     },
   ],
   exports: [
-    IContactRepository,
     IBusinessRepository,
     ICategoryRepository,
     ICommentRepository,

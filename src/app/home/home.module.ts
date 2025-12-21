@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-import { ContactModule } from "./contact/contact.module";
 import { BusinessModule } from "./business/business.module";
 import { CategoriesModule } from "./categories/categories.module";
 import { CommentsModule } from "./comments/comments.module";
@@ -11,7 +10,6 @@ import { AccountsModule } from "./accounts/accounts.module";
 
 @Module({
   imports: [
-    ContactModule,
     BusinessModule,
     CategoriesModule,
     CommentsModule,
