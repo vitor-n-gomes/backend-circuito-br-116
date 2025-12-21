@@ -16,7 +16,7 @@ export class BusinessRepository implements IBusinessRepository {
   constructor(
     @InjectRepository(Business)
     private readonly businessRepo: Repository<Business>
-  ) {}
+  ) { }
 
   async findById(id: number): Promise<BusinessResponseDto | null> {
     const business = await this.businessRepo.findOne({ where: { auxId: id } });
@@ -218,7 +218,17 @@ export class BusinessRepository implements IBusinessRepository {
 
     const businesses = await this.businessRepo.query(query, params);
 
-    return businesses.map((b) => toObjectResponseMapper(b, BusinessResponseDto));
+    return businesses.map((b) => {
+
+      b.categoryId = b.category_id;
+      b.auxId = b.aux_id;
+
+      delete b.category_id;
+      delete b.aux_id
+
+      return toObjectResponseMapper(b, BusinessResponseDto)
+    }
+    );
   }
 
   async findByAccountId(
