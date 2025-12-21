@@ -6,6 +6,7 @@ import { AppModule } from '@/app.module';
 describe('BusinessController - Update Business (e2e)', () => {
   let app: INestApplication;
   let testBusinessId: number;
+  let validLocationId: number;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -15,13 +16,21 @@ describe('BusinessController - Update Business (e2e)', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
 
+    // Get a valid location ID from the database
+    const locationsRes = await request(app.getHttpServer())
+      .get('/locations')
+      .expect(200);
+    
+    expect(locationsRes.body.length).toBeGreaterThan(0);
+    validLocationId = locationsRes.body[0].aux_id;
+
     // Create a test business for updates
     const accountId = 1;
     const newBusiness = {
       title: 'Test Business for Updates',
       description: 'Original description',
       categoryId: 1,
-      locationId: 1,
+      locationId: validLocationId,
       locationPretty: 'Km 100, Test City - SP',
       locationLat: -23.5505,
       locationLong: -46.6333,
@@ -31,7 +40,8 @@ describe('BusinessController - Update Business (e2e)', () => {
     const createRes = await request(app.getHttpServer())
       .post('/businesses')
       .query({ accountId })
-      .send(newBusiness);
+      .send(newBusiness)
+      .expect(201);
 
     testBusinessId = createRes.body.auxId;
   });
