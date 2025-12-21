@@ -84,21 +84,11 @@ export class Account {
   @Column({ name: 'intro_skipped', type: 'boolean', default: false })
   introSkipped: boolean;
 
-  @Column({ name: 'selected_currency_id', type: 'uuid', nullable: true })
-  selectedCurrencyId: string;
-
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
-
-  // Virtual field for raw email (will be handled in the repository)
-  rawEmail?: string;
-
-  // Relations
-  asset?: any;
-  selectedCurrency?: any;
 
   @OneToMany(() => Business, (business) => business.account)
   businesses: Business[];
