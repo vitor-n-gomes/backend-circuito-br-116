@@ -27,7 +27,12 @@ export class AssetRepository implements IAssetRepository {
   }
 
   async create(data: CreateAssetDto): Promise<AssetResponseDto> {
-    const asset = this.assetRepo.create(data);
+    const now = new Date();
+    const asset = this.assetRepo.create({
+      ...data,
+      createdAt: now,
+      updatedAt: now,
+    });
     const saved = await this.assetRepo.save(asset);
     return toObjectResponseMapper(saved, AssetResponseDto);
   }

@@ -1,11 +1,12 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, Generated, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('assets')
 export class Asset {
   @PrimaryColumn({ type: 'uuid', default: () => 'gen_random_uuid()' })
   id: string;
 
-  @Column({ type: 'integer' })
+  @Column({ name: 'aux_id', type: 'integer' })
+  @Generated('increment')
   aux_id: number;
 
   @Column({ type: 'varchar', length: 100 })
@@ -17,9 +18,9 @@ export class Asset {
   @Column({ name: 'initialName', type: 'varchar', nullable: true })
   initialName: string;
 
-  @CreateDateColumn({ name: 'createdAt' })
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updatedAt' })
+  @UpdateDateColumn({ name: 'updatedAt', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 }

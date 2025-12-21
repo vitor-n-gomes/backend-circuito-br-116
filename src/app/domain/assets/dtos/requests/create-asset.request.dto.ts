@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsOptional, IsPositive } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateAssetDto {
@@ -9,6 +9,7 @@ export class CreateAssetDto {
 
   @ApiProperty({ description: 'File size in bytes', example: 1024000 })
   @IsNumber()
+  @IsPositive()
   @IsNotEmpty()
   size: number;
 
