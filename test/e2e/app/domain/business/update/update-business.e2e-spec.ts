@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '@/app.module';
+import { getRandomLocationId } from '../factories/relation.factory';
 
 describe('BusinessController - Update Business (e2e)', () => {
   let app: INestApplication;
@@ -17,12 +18,7 @@ describe('BusinessController - Update Business (e2e)', () => {
     await app.init();
 
     // Get a valid location ID from the database
-    const locationsRes = await request(app.getHttpServer())
-      .get('/locations')
-      .expect(200);
-    
-    expect(locationsRes.body.length).toBeGreaterThan(0);
-    validLocationId = locationsRes.body[0].aux_id;
+    validLocationId = getRandomLocationId();;
 
     // Create a test business for updates
     const accountId = 1;

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '@/app.module';
-import { getRandomId } from '../factories/relation.factory';
+import { getRandomLocationId } from '../factories/relation.factory';
 
 describe('BusinessController - Create Business (e2e)', () => {
   let app: INestApplication;
@@ -18,7 +18,7 @@ describe('BusinessController - Create Business (e2e)', () => {
     await app.init();
 
     // Get a valid location ID for tests
-    validLocationId = getRandomId();
+    validLocationId = getRandomLocationId();
   });
 
   afterAll(async () => {

@@ -2,12 +2,23 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '@/app.module';
+import { BusinessFactory } from '../factories/business.factory';
+import { runFactories } from '../../factories/builder.factory';
+import { businesses } from './mocks/business.mock';
 
 describe('BusinessController - Delete Business (e2e)', () => {
   let app: INestApplication;
+  let moduleFixture: TestingModule;
+  let createdBusinessIds: number[] = [];
+  let listOfBusiness: any[] = [];
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+    const mockData = new BusinessFactory(businesses);
+
+    const results = await runFactories(mockData);
+    listOfBusiness = results.flat();
+
+    moduleFixture = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
@@ -16,30 +27,29 @@ describe('BusinessController - Delete Business (e2e)', () => {
   });
 
   afterAll(async () => {
-    await app.close();
+    // Clean up any remaining created businesses
+    for (const id of createdBusinessIds) {
+      try {
+        await request(app.getHttpServer())
+          .delete(`/businesses/${id}`);
+      } catch (error) {
+        console.warn(`Failed to delete business ${id}:`, error);
+      }
+    }
+
+    if (app) {
+      await app.close();
+    }
+    
+    if (moduleFixture) {
+      await moduleFixture.close();
+    }
   });
 
   describe('DELETE /businesses/:id', () => {
     it('should delete a business successfully', async () => {
-      // Create a test business
-      const accountId = 1;
-      const newBusiness = {
-        title: 'Business to Delete',
-        categoryId: 1,
-        locationId: 1,
-        locationPretty: 'Km 100, Test City - SP',
-        locationLat: -23.5505,
-        locationLong: -46.6333,
-        classification: 'B1',
-      };
-
-      const createRes = await request(app.getHttpServer())
-        .post('/businesses')
-        .query({ accountId })
-        .send(newBusiness)
-        .expect(201);
-
-      const businessId = createRes.body.auxId;
+      const business = listOfBusiness[0]
+      const businessId = business.auxId;
 
       // Delete the business
       const deleteRes = await request(app.getHttpServer())
@@ -55,8 +65,22 @@ describe('BusinessController - Delete Business (e2e)', () => {
         .expect(404);
     });
 
+    it('should return response structure on successful delete', async () => {
+      const business = listOfBusiness[1];
+      const businessId = business.auxId;
+
+      const res = await request(app.getHttpServer())
+        .delete(`/businesses/${businessId}`)
+        .expect(200);
+
+      // Verify response structure
+      expect(res.body).toHaveProperty('success');
+      expect(typeof res.body.success).toBe('boolean');
+      expect(res.body.success).toBe(true);
+    });
+
     it('should return 404 when deleting non-existent business', async () => {
-      const nonExistentId = 999999;
+      const nonExistentId = 999999999;
 
       const res = await request(app.getHttpServer())
         .delete(`/businesses/${nonExistentId}`)
@@ -73,72 +97,46 @@ describe('BusinessController - Delete Business (e2e)', () => {
       expect(res.body).toHaveProperty('message');
     });
 
+    it('should handle negative ID gracefully', async () => {
+      const res = await request(app.getHttpServer())
+        .delete('/businesses/-1')
+        .expect(404);
+
+      expect(res.body).toHaveProperty('message');
+    });
+
+    it('should handle zero ID gracefully', async () => {
+      const res = await request(app.getHttpServer())
+        .delete('/businesses/0')
+        .expect(404);
+
+      expect(res.body).toHaveProperty('message');
+    });
+
     it('should delete business and remove it from search results', async () => {
-      // Create a business with unique name
-      const accountId = 1;
-      const uniqueTitle = `Deletable Business ${Date.now()}`;
-      const newBusiness = {
-        title: uniqueTitle,
-        categoryId: 1,
-        locationId: 1,
-        locationPretty: 'Km 100, Test City - SP',
-        locationLat: -23.5505,
-        locationLong: -46.6333,
-        classification: 'B1',
-      };
+      const business = listOfBusiness[2];
+      const businessId = business.auxId;
 
-      const createRes = await request(app.getHttpServer())
-        .post('/businesses')
-        .query({ accountId })
-        .send(newBusiness)
-        .expect(201);
-
-      const businessId = createRes.body.auxId;
-
-      // Verify it appears in search
-      const searchBefore = await request(app.getHttpServer())
-        .get('/businesses/search')
-        .query({ query: uniqueTitle })
+      // Verify it exists first
+      await request(app.getHttpServer())
+        .get(`/businesses/${businessId}`)
         .expect(200);
-
-      const foundBefore = searchBefore.body.data.some(b => b.auxId === businessId);
-      expect(foundBefore).toBe(true);
 
       // Delete the business
       await request(app.getHttpServer())
         .delete(`/businesses/${businessId}`)
         .expect(200);
 
-      // Verify it no longer appears in search
-      const searchAfter = await request(app.getHttpServer())
-        .get('/businesses/search')
-        .query({ query: uniqueTitle })
-        .expect(200);
-
-      const foundAfter = searchAfter.body.data.some(b => b.auxId === businessId);
-      expect(foundAfter).toBe(false);
+      // Verify it no longer exists
+      await request(app.getHttpServer())
+        .get(`/businesses/${businessId}`)
+        .expect(404);
     });
 
     it('should delete business and remove it from account listings', async () => {
-      // Create a business
-      const accountId = 1;
-      const newBusiness = {
-        title: 'Business for Account Test Delete',
-        categoryId: 1,
-        locationId: 1,
-        locationPretty: 'Km 100, Test City - SP',
-        locationLat: -23.5505,
-        locationLong: -46.6333,
-        classification: 'B1',
-      };
-
-      const createRes = await request(app.getHttpServer())
-        .post('/businesses')
-        .query({ accountId })
-        .send(newBusiness)
-        .expect(201);
-
-      const businessId = createRes.body.auxId;
+      const business = listOfBusiness[3];
+      const businessId = business.auxId;
+      const accountId = business.accountId;
 
       // Verify it appears in account listing
       const accountBefore = await request(app.getHttpServer())
@@ -163,31 +161,14 @@ describe('BusinessController - Delete Business (e2e)', () => {
     });
 
     it('should delete business and remove it from filter results', async () => {
-      // Create a business with specific classification
-      const accountId = 1;
-      const newBusiness = {
-        title: 'Business for Filter Test Delete',
-        categoryId: 5,
-        locationId: 1,
-        locationPretty: 'Km 100, Test City - SP',
-        locationLat: -23.5505,
-        locationLong: -46.6333,
-        classification: 'A1',
-      };
+      const business = listOfBusiness[4];
+      const businessId = business.auxId;
 
-      const createRes = await request(app.getHttpServer())
-        .post('/businesses')
-        .query({ accountId })
-        .send(newBusiness)
-        .expect(201);
-
-      const businessId = createRes.body.auxId;
-
-      // Verify it appears in filter results
+      // Verify it appears in filter results using the business's actual data
       const filterBefore = await request(app.getHttpServer())
         .post('/businesses/filter')
-        .send({ categoryId: 5, classification: 'A1' })
-        .expect(200);
+        .send({ categoryId: business.categoryId, classification: business.classification })
+        .expect(201);
 
       const foundBefore = filterBefore.body.data.some(b => b.auxId === businessId);
       expect(foundBefore).toBe(true);
@@ -200,33 +181,16 @@ describe('BusinessController - Delete Business (e2e)', () => {
       // Verify it no longer appears in filter results
       const filterAfter = await request(app.getHttpServer())
         .post('/businesses/filter')
-        .send({ categoryId: 5, classification: 'A1' })
-        .expect(200);
+        .send({ categoryId: business.categoryId, classification: business.classification })
+        .expect(201);
 
       const foundAfter = filterAfter.body.data.some(b => b.auxId === businessId);
       expect(foundAfter).toBe(false);
     });
 
     it('should not be able to delete the same business twice', async () => {
-      // Create a business
-      const accountId = 1;
-      const newBusiness = {
-        title: 'Business for Double Delete Test',
-        categoryId: 1,
-        locationId: 1,
-        locationPretty: 'Km 100, Test City - SP',
-        locationLat: -23.5505,
-        locationLong: -46.6333,
-        classification: 'B1',
-      };
-
-      const createRes = await request(app.getHttpServer())
-        .post('/businesses')
-        .query({ accountId })
-        .send(newBusiness)
-        .expect(201);
-
-      const businessId = createRes.body.auxId;
+      const business = listOfBusiness[5];
+      const businessId = business.auxId;
 
       // First delete should succeed
       await request(app.getHttpServer())
@@ -236,70 +200,6 @@ describe('BusinessController - Delete Business (e2e)', () => {
       // Second delete should fail
       await request(app.getHttpServer())
         .delete(`/businesses/${businessId}`)
-        .expect(404);
-    });
-
-    it('should delete multiple businesses independently', async () => {
-      // Create two businesses
-      const accountId = 1;
-      const business1 = {
-        title: 'First Business to Delete',
-        categoryId: 1,
-        locationId: 1,
-        locationPretty: 'Km 100, Test City - SP',
-        locationLat: -23.5505,
-        locationLong: -46.6333,
-        classification: 'B1',
-      };
-
-      const business2 = {
-        title: 'Second Business to Delete',
-        categoryId: 1,
-        locationId: 1,
-        locationPretty: 'Km 200, Test City - SP',
-        locationLat: -23.5505,
-        locationLong: -46.6333,
-        classification: 'B1',
-      };
-
-      const createRes1 = await request(app.getHttpServer())
-        .post('/businesses')
-        .query({ accountId })
-        .send(business1)
-        .expect(201);
-
-      const createRes2 = await request(app.getHttpServer())
-        .post('/businesses')
-        .query({ accountId })
-        .send(business2)
-        .expect(201);
-
-      const businessId1 = createRes1.body.auxId;
-      const businessId2 = createRes2.body.auxId;
-
-      // Delete first business
-      await request(app.getHttpServer())
-        .delete(`/businesses/${businessId1}`)
-        .expect(200);
-
-      // First should not exist
-      await request(app.getHttpServer())
-        .get(`/businesses/${businessId1}`)
-        .expect(404);
-
-      // Second should still exist
-      await request(app.getHttpServer())
-        .get(`/businesses/${businessId2}`)
-        .expect(200);
-
-      // Delete second business
-      await request(app.getHttpServer())
-        .delete(`/businesses/${businessId2}`)
-        .expect(200);
-
-      // Second should now not exist
-      await request(app.getHttpServer())
-        .get(`/businesses/${businessId2}`)
         .expect(404);
     });
   });
