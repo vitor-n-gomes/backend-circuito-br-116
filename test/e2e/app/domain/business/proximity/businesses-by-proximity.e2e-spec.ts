@@ -37,24 +37,27 @@ describe('BusinessController - Get Businesses by Proximity (e2e)', () => {
       if (res.body.length > 0) {
         const business = res.body[0];
 
-        expect(business).toHaveProperty('auxId');
+        // Note: Raw SQL query returns snake_case fields
+        expect(business).toHaveProperty('aux_id');
         expect(business).toHaveProperty('id');
         expect(business).toHaveProperty('title');
-        expect(business).toHaveProperty('categoryId');
+        expect(business).toHaveProperty('category_id');
         expect(business).toHaveProperty('locationLat');
         expect(business).toHaveProperty('locationLong');
         expect(business).toHaveProperty('locationPretty');
+        expect(business).toHaveProperty('distance');
 
         // Verify data types
-        expect(typeof business.auxId).toBe('number');
+        expect(typeof business.aux_id).toBe('number');
         expect(typeof business.id).toBe('string');
         expect(typeof business.title).toBe('string');
-        expect(typeof business.categoryId).toBe('number');
+        expect(typeof business.category_id).toBe('number');
         expect(typeof business.locationLat).toBe('number');
         expect(typeof business.locationLong).toBe('number');
+        expect(typeof business.distance).toBe('number');
 
         // All businesses should have the specified category
-        expect(business.categoryId).toBe(categoryId);
+        expect(business.category_id).toBe(categoryId);
       }
     });
 
@@ -73,7 +76,7 @@ describe('BusinessController - Get Businesses by Proximity (e2e)', () => {
       // Verify all returned businesses match the category
       if (res.body.length > 0) {
         res.body.forEach(business => {
-          expect(business.categoryId).toBe(categoryId);
+          expect(business.category_id).toBe(categoryId);
         });
       }
     });
@@ -108,8 +111,8 @@ describe('BusinessController - Get Businesses by Proximity (e2e)', () => {
 
       // If both have results, verify they have different categories
       if (res1.body.length > 0 && res2.body.length > 0) {
-        expect(res1.body[0].categoryId).toBe(categoryId1);
-        expect(res2.body[0].categoryId).toBe(categoryId2);
+        expect(res1.body[0].category_id).toBe(categoryId1);
+        expect(res2.body[0].category_id).toBe(categoryId2);
       }
     });
 

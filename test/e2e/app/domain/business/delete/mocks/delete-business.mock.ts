@@ -1,3 +1,3 @@
 import { createBusinessFactory } from "../../../factories/business.mock";
 
-export const listOfBusinessTest = createBusinessFactory(6);
+export const listOfBusinessToBeDeleted = createBusinessFactory(6);

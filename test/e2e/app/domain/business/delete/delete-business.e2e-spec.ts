@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from '@/app.module';
 import { BusinessFactory } from '../factories/business.factory';
 import { runFactories } from '../../factories/builder.factory';
-import { listOfBusinessTest } from './mocks/delete-business.mock';
+import { listOfBusinessToBeDeleted } from './mocks/delete-business.mock';
 
 describe('BusinessController - Delete Business (e2e)', () => {
   let app: INestApplication;
@@ -13,7 +13,7 @@ describe('BusinessController - Delete Business (e2e)', () => {
 
   beforeAll(async () => {
 
-    const mockData = new BusinessFactory(listOfBusinessTest);
+    const mockData = new BusinessFactory(listOfBusinessToBeDeleted);
 
     const results = await runFactories(mockData);
     listOfBusiness = results.flat();
@@ -158,8 +158,8 @@ describe('BusinessController - Delete Business (e2e)', () => {
       // Verify it appears in filter results using the business's actual data
       const filterBefore = await request(app.getHttpServer())
         .post('/businesses/filter')
-        .send({ categoryId: business.categoryId, classification: business.classification })
-        .expect(201);
+        .send({ categories: [business.categoryId], classifications: [business.classification] })
+        .expect(200);
 
       const foundBefore = filterBefore.body.data.some(b => b.auxId === businessId);
       expect(foundBefore).toBe(true);
@@ -172,8 +172,8 @@ describe('BusinessController - Delete Business (e2e)', () => {
       // Verify it no longer appears in filter results
       const filterAfter = await request(app.getHttpServer())
         .post('/businesses/filter')
-        .send({ categoryId: business.categoryId, classification: business.classification })
-        .expect(201);
+        .send({ categories: [business.categoryId], classifications: [business.classification] })
+        .expect(200);
 
       const foundAfter = filterAfter.body.data.some(b => b.auxId === businessId);
       expect(foundAfter).toBe(false);

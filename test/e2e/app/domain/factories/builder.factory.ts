@@ -58,6 +58,8 @@ export async function runFactories(factory: FactoryBuilder): Promise<any[]> {
     if (dataSource.isInitialized) {
       await dataSource.destroy();
       console.log('\n👋 Database connection closed');
+      // Give connections time to fully close
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
   }
 }

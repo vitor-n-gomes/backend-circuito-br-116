@@ -47,5 +47,7 @@ module.exports = {
         '<rootDir>/src/.*\\.dto\\.ts$',
         '<rootDir>/src/.*\\.module\\.ts$',
         '<rootDir>/src/main.ts$'
-    ]
+    ],
+    forceExit: true,
+    detectOpenHandles: false
 }

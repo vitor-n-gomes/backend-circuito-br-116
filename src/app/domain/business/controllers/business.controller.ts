@@ -10,6 +10,7 @@ import {
   ValidationPipe,
   ParseIntPipe,
   ParseFloatPipe,
+  HttpCode,
 } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiParam, ApiQuery, ApiOperation } from '@nestjs/swagger';
 import { CreateBusinessDto } from '../dtos/requests/create-business.request.dto';
@@ -103,6 +104,7 @@ export class BusinessController {
   }
 
   @Post('filter')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Filter businesses with advanced criteria' })
   @ApiQuery({ name: 'page', required: false, type: 'number', example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: 'number', example: 20 })
@@ -169,6 +171,7 @@ export class BusinessController {
   }
 
   @Post(':id/increment-views')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Increment business view count' })
   @ApiParam({ name: 'id', type: 'number', example: 1 })
   @ApiResponse({ status: 200 })
