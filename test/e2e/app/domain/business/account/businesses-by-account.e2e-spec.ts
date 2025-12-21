@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '@/app.module';
 
@@ -12,6 +12,14 @@ describe('BusinessController - Get Businesses by Account (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        transformOptions: {
+          enableImplicitConversion: true,
+        },
+      })
+    );
     await app.init();
   });
 
@@ -29,11 +37,10 @@ describe('BusinessController - Get Businesses by Account (e2e)', () => {
 
       // Verify pagination structure
       expect(res.body).toHaveProperty('data');
-      expect(res.body).toHaveProperty('meta');
-      expect(res.body.meta).toHaveProperty('total');
-      expect(res.body.meta).toHaveProperty('page');
-      expect(res.body.meta).toHaveProperty('limit');
-      expect(res.body.meta).toHaveProperty('totalPages');
+      expect(res.body).toHaveProperty('currentPage');
+      expect(res.body).toHaveProperty('totalElements');
+      expect(res.body).toHaveProperty('lastPage');
+      expect(res.body).toHaveProperty('firstPage');
 
       // Verify data is an array
       expect(Array.isArray(res.body.data)).toBe(true);
@@ -63,8 +70,7 @@ describe('BusinessController - Get Businesses by Account (e2e)', () => {
         .get(`/businesses/account/${accountId}`)
         .expect(200);
 
-      expect(res.body.meta.page).toBe(1);
-      expect(res.body.meta.limit).toBe(20);
+      expect(res.body.currentPage).toBe(1);
       expect(res.body.data.length).toBeLessThanOrEqual(20);
     });
 
@@ -78,8 +84,7 @@ describe('BusinessController - Get Businesses by Account (e2e)', () => {
         .query({ page, limit })
         .expect(200);
 
-      expect(res.body.meta.page).toBe(page);
-      expect(res.body.meta.limit).toBe(limit);
+      expect(res.body.currentPage).toBe(page);
       expect(res.body.data.length).toBeLessThanOrEqual(limit);
     });
 
@@ -91,7 +96,7 @@ describe('BusinessController - Get Businesses by Account (e2e)', () => {
         .expect(200);
 
       expect(res.body.data).toEqual([]);
-      expect(res.body.meta.total).toBe(0);
+      expect(res.body.totalElements).toBe(0);
     });
 
     it('should handle second page correctly', async () => {
@@ -103,13 +108,13 @@ describe('BusinessController - Get Businesses by Account (e2e)', () => {
         .query({ page: 1, limit })
         .expect(200);
 
-      if (res1.body.meta.totalPages > 1) {
+      if (res1.body.totalElements > limit) {
         const res2 = await request(app.getHttpServer())
           .get(`/businesses/account/${accountId}`)
           .query({ page: 2, limit })
           .expect(200);
 
-        expect(res2.body.meta.page).toBe(2);
+        expect(res2.body.currentPage).toBe(2);
 
         // Ensure different results on different pages
         if (res1.body.data.length > 0 && res2.body.data.length > 0) {

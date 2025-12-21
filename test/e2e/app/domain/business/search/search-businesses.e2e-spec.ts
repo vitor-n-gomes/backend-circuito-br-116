@@ -28,11 +28,10 @@ describe('BusinessController - Search Businesses (e2e)', () => {
 
       // Verify pagination structure
       expect(res.body).toHaveProperty('data');
-      expect(res.body).toHaveProperty('meta');
-      expect(res.body.meta).toHaveProperty('total');
-      expect(res.body.meta).toHaveProperty('page');
-      expect(res.body.meta).toHaveProperty('limit');
-      expect(res.body.meta).toHaveProperty('totalPages');
+      expect(res.body).toHaveProperty('currentPage');
+      expect(res.body).toHaveProperty('totalElements');
+      expect(res.body).toHaveProperty('lastPage');
+      expect(res.body).toHaveProperty('firstPage');
 
       // Verify data is an array
       expect(Array.isArray(res.body.data)).toBe(true);
@@ -92,8 +91,7 @@ describe('BusinessController - Search Businesses (e2e)', () => {
         .query({ query: 'hotel' })
         .expect(200);
 
-      expect(res.body.meta.page).toBe(1);
-      expect(res.body.meta.limit).toBe(20);
+      expect(res.body.currentPage).toBe(1);
       expect(res.body.data.length).toBeLessThanOrEqual(20);
     });
 
@@ -106,8 +104,7 @@ describe('BusinessController - Search Businesses (e2e)', () => {
         .query({ query: 'posto', page, limit })
         .expect(200);
 
-      expect(res.body.meta.page).toBe(page);
-      expect(res.body.meta.limit).toBe(limit);
+      expect(res.body.currentPage).toBe(page);
       expect(res.body.data.length).toBeLessThanOrEqual(limit);
     });
 
@@ -118,7 +115,7 @@ describe('BusinessController - Search Businesses (e2e)', () => {
         .expect(200);
 
       expect(res.body.data).toEqual([]);
-      expect(res.body.meta.total).toBe(0);
+      expect(res.body.totalElements).toBe(0);
     });
 
     it('should handle case-insensitive search', async () => {
@@ -133,7 +130,7 @@ describe('BusinessController - Search Businesses (e2e)', () => {
         .expect(200);
 
       // Both searches should return the same number of results
-      expect(res1.body.meta.total).toBe(res2.body.meta.total);
+      expect(res1.body.totalElements).toBe(res2.body.totalElements);
     });
 
     it('should search for specific business - Shell Select', async () => {
@@ -170,13 +167,13 @@ describe('BusinessController - Search Businesses (e2e)', () => {
         .query({ query: 'a', page: 1, limit })
         .expect(200);
 
-      if (res1.body.meta.totalPages > 1) {
+      if (res1.body.totalElements > limit) {
         const res2 = await request(app.getHttpServer())
           .get('/businesses/search')
           .query({ query: 'a', page: 2, limit })
           .expect(200);
 
-        expect(res2.body.meta.page).toBe(2);
+        expect(res2.body.currentPage).toBe(2);
         
         // Ensure different results on different pages
         if (res1.body.data.length > 0 && res2.body.data.length > 0) {

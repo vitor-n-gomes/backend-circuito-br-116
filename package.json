@@ -18,7 +18,7 @@
       "test:watch": "jest --watch",
       "test:cov": "jest --coverage",
       "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-      "test:e2e": "NODE_ENV=test jest --config jest-e2e.config.js --silent --maxWorkers=50%",
+      "test:e2e": "jest --config ./jest-e2e.config.js --runInBand --detectOpenHandles",
       "seed": "ts-node -r tsconfig-paths/register src/app/infra/repositories/type-orm/seeds/seed.ts",
       "typeorm": "ts-node ./node_modules/typeorm/cli.js",
       "migration:generate": "typeorm migration:generate -d ./src/migration",
