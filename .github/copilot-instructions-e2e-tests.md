@@ -11,6 +11,8 @@ End-to-end tests verify the complete HTTP request-response cycle using the actua
 3. **Use existing production data** for read operations when possible
 4. **Minimize writes** - Only create test data when absolutely necessary
 5. **Use unique identifiers** (timestamps, UUIDs) to avoid conflicts
+6. **Wrap cleanup in try-catch** - Don't let cleanup errors break test suite
+7. **Close all connections properly** - Both app and moduleFixture in `afterAll`
 
 ## E2E Test Structure
 
@@ -62,17 +64,77 @@ test/e2e/app/domain/business/
 - **Consistency**: Ensure valid test data across all tests
 - **Readability**: `createBusinessPayload({ title: 'Custom' })` is clearer
 - **Isolation**: Unique timestamps prevent cross-test pollution
+- **Performance**: Direct database insertion is faster than HTTP requests
+- **Setup Efficiency**: Seed multiple entities in one transaction
+
+### Factory Builder Pattern - Critical Execution Order
+
+**IMPORTANT:** The factory must run **BEFORE** initializing the NestJS app:
+
+```typescript
+beforeAll(async () => {
+  // 1️⃣ FIRST: Seed data using factory (creates its own DB connection)
+  const factory = new EntityFactory([createEntityData()]);
+  const [seededEntity] = await runFactories(factory);
+  testEntityId = seededEntity.id;
+
+  // 2️⃣ THEN: Initialize NestJS app (creates separate DB connection pool)
+  moduleFixture = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
+
+  app = moduleFixture.createNestApplication();
+  await app.init();
+});
+```
+
+**Why this order matters:**
+- Factory opens temporary connection → seeds data → closes connection immediately
+- App creates persistent connection pool → handles test requests → closes in afterAll
+- Reversing this causes connection timeouts and hangs
 
 ### Factory Implementation Template
 
 ```typescript
 // filepath: test/e2e/app/domain/[module]/factories/[entity].factory.ts
 
-/**
- * Factory for creating [Entity] test data
- * Provides smart defaults and easy customization
- */
+import { DataSource } from 'typeorm';
+import { [Entity] } from '@/app/infra/repositories/type-orm/models/[entity].entity';
+import { FactoryBuilder } from '../../factories/builder.factory';
 
+/**
+ * Factory for creating [Entity] entities in the database
+ * Implements FactoryBuilder pattern for consistent test data seeding
+ */
+export class [Entity]Factory implements FactoryBuilder {
+  entities: Partial<[Entity]>[];
+  
+  constructor(entities: Partial<[Entity]>[]) {
+    this.entities = entities;
+  }
+
+  async run(dataSource: DataSource): Promise<[Entity][]> {
+    const entityRepo = dataSource.getRepository([Entity]);
+
+    // CRITICAL: Explicitly set timestamps for entities
+    // TypeORM decorators alone may not populate these reliably
+    const entitiesWithTimestamps = this.entities.map(entity => ({
+      ...entity,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }));
+
+    const savedEntities = await entityRepo.save(entitiesWithTimestamps);
+    
+    console.log(`✅ Factory created ${savedEntities.length} [entity] successfully!`);
+    
+    return savedEntities;
+  }
+}
+
+/**
+ * Helper interface for creating entity payloads
+ */
 export interface Create[Entity]Options {
   // All entity fields as optional
   field1?: string;
@@ -123,6 +185,25 @@ export function createMinimal[Entity]Payload(): Record<string, any> {
     // Only required fields
     requiredField1: `Minimal ${Date.now()}`,
     requiredField2: 1,
+  };
+}
+
+/**
+ * Creates entity data for database seeding
+ * Use this with [Entity]Factory for creating test data directly in the database
+ * 
+ * @example
+ * const entityData = create[Entity]Entity({ field: 'value' });
+ * const factory = new [Entity]Factory([entityData]);
+ * const [created] = await runFactories(factory);
+ */
+export function create[Entity]Entity(options: Create[Entity]Options = {}): Partial<[Entity]> {
+  const timestamp = Date.now();
+  
+  return {
+    field1: options.field1 ?? `Default ${timestamp}`,
+    field2: options.field2 ?? 1,
+    // Don't set createdAt/updatedAt here - factory handles it
   };
 }
 
@@ -196,15 +277,18 @@ describe('[ModuleController] - [Operation] (e2e)', () => {
   let testEntityId: number; // If test creates data
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+    // Setup: Create test data using factory BEFORE app initialization
+    // Only if needed - prefer testing with existing production data for read operations
+    // const factory = new [Entity]Factory([create[Entity]Entity()]);
+    // const [seededEntity] = await runFactories(factory);
+    // testEntityId = seededEntity.id;
+
+    moduleFixture = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
-
-    // Setup: Create test data if needed (minimize this)
-    // Use factories for data creation
   });
 
   afterAll(async () => {
@@ -218,7 +302,14 @@ describe('[ModuleController] - [Operation] (e2e)', () => {
       }
     }
 
-    await app.close();
+    // CRITICAL: Close both app and moduleFixture to prevent connection leaks
+    if (app) {
+      await app.close();
+    }
+
+    if (moduleFixture) {
+      await moduleFixture.close();
+    }
   });
 
   describe('[HTTP_METHOD] /endpoint', () => {
@@ -418,24 +509,39 @@ describe('POST /endpoint', () => {
 ```
 
 ### 3. Update Operations (PUT/PATCH)
-**Pattern**: Create → Update → Verify → Clean up
+**Pattern**: Seed with Factory → Update → Verify → Clean up
 ```typescript
 describe('PUT /endpoint/:id', () => {
+  let app: INestApplication;
+  let moduleFixture: TestingModule;
   let testId: number;
 
   beforeAll(async () => {
-    const payload = createEntityPayload();
-    const res = await request(app.getHttpServer())
-      .post('/endpoint')
-      .send(payload)
-      .expect(201);
-    testId = res.body.id;
+    // Use factory to seed test data
+    const factory = new EntityFactory([createEntityEntity()]);
+    const [entity] = await runFactories(factory);
+    testId = entity.id;
+
+    // Then initialize app
+    moduleFixture = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    await app.init();
   });
 
   afterAll(async () => {
     if (testId) {
-      await request(app.getHttpServer()).delete(`/endpoint/${testId}`);
+      try {
+        await request(app.getHttpServer()).delete(`/endpoint/${testId}`);
+      } catch (error) {
+        console.warn(`Cleanup failed:`, error);
+      }
     }
+
+    if (app) await app.close();
+    if (moduleFixture) await moduleFixture.close();
   });
 
   it('should update single field', async () => {
@@ -569,6 +675,31 @@ describe('Pagination', () => {
 
 ## Common Test Scenarios
 
+### Debugging Failed Tests
+
+When tests fail with unclear errors, add temporary logging:
+
+```typescript
+it('should create entity', async () => {
+  const payload = createEntityPayload();
+
+  const res = await request(app.getHttpServer())
+    .post('/endpoint')
+    .send(payload);
+
+  // Temporary debugging - remove after fixing
+  console.log('Response status:', res.status);
+  console.log('Response body:', JSON.stringify(res.body, null, 2));
+  
+  expect(res.status).toBe(201);
+});
+```
+
+**Common issues revealed by logging:**
+- `createdAt: null` → Repository not setting timestamps
+- `aux_id: null` → Missing `@Generated('increment')` decorator
+- Validation errors → Missing or incorrect DTO validators
+
 ### Validation Testing
 ```typescript
 it('should validate required fields', async () => {
@@ -597,6 +728,30 @@ it('should validate field formats', async () => {
 it('should validate numeric ranges', async () => {
   const invalidPayload = createEntityPayload({
     latitude: 200, // Invalid: should be -90 to 90
+  });
+
+  await request(app.getHttpServer())
+    .post('/endpoint')
+    .send(invalidPayload)
+    .expect(400);
+});
+
+it('should validate positive numbers', async () => {
+  const invalidPayload = createEntityPayload({
+    size: -100, // Invalid: should be positive
+  });
+
+  const res = await request(app.getHttpServer())
+    .post('/endpoint')
+    .send(invalidPayload)
+    .expect(400);
+
+  expect(res.body).toHaveProperty('message');
+});
+
+it('should reject zero for positive fields', async () => {
+  const invalidPayload = createEntityPayload({
+    size: 0, // Invalid: should be positive (> 0)
   });
 
   await request(app.getHttpServer())
@@ -679,6 +834,7 @@ it('should fail with invalid foreign key', async () => {
 - ✅ Group related tests with `describe` blocks
 - ✅ Use clear, descriptive test names
 - ✅ Order tests logically (happy path → edge cases → errors)
+- ✅ Run tests incrementally during development (create → read → update → delete)
 
 ### 2. Data Management
 - ✅ **Always clean up created data** in `afterAll` hooks
@@ -695,14 +851,22 @@ it('should fail with invalid foreign key', async () => {
 
 ### 4. Error Handling
 - ✅ Wrap cleanup in try-catch to prevent test failures from blocking cleanup
-- ✅ Log warnings for cleanup failures
+- ✅ Log warnings for cleanup failures (use `console.warn`, not `console.error`)
 - ✅ Test all error scenarios (400, 404, 500)
+- ✅ Add temporary debug logging when tests fail mysteriously
 
 ### 5. Readability
 - ✅ Use factories instead of inline object creation
 - ✅ Extract magic numbers to named constants
 - ✅ Add comments for complex test scenarios
 - ✅ Keep tests focused on single responsibility
+
+### 6. Repository & Entity Configuration
+- ✅ **Always explicitly set timestamps** in repository create methods
+- ✅ Use `@Generated('increment')` for auto-incrementing columns
+- ✅ Add `@IsPositive()` for fields that must be positive numbers
+- ✅ Verify entity decorators match database schema constraints
+- ✅ Check existing working repositories (e.g., Business) for patterns
 
 ## Anti-Patterns to Avoid
 
@@ -720,6 +884,13 @@ const business = {
 // ❌ Hard-coded IDs
 const categoryId = 1;
 const locationId = 5;
+
+// ❌ Initialize app BEFORE seeding with factory
+beforeAll(async () => {
+  app = await createApp(); // Wrong order!
+  const factory = new EntityFactory([data]);
+  await runFactories(factory); // This will timeout
+});
 
 // ❌ No cleanup
 it('should create business', async () => {
@@ -741,6 +912,19 @@ it('should work', async () => {});
 it('should do everything', async () => {
   // Creates, updates, deletes, searches...
 });
+
+// ❌ Assuming TypeORM decorators auto-populate fields
+async create(data: CreateDto) {
+  const entity = this.repo.create(data);
+  return await this.repo.save(entity);
+  // Missing explicit timestamp setting!
+}
+
+// ❌ Forgetting to close moduleFixture
+afterAll(async () => {
+  await app.close(); // Not enough!
+  // Missing: await moduleFixture.close();
+});
 ```
 
 ### ✅ Do
@@ -755,10 +939,41 @@ const categoryId = getRandomCategoryId();
 const locationId = getRandomLocationId();
 
 // ✅ Always clean up
+// ✅ One responsibility per test
+it('should create business with valid data', async () => {});
+it('should update business title', async () => {});
+it('should delete business', async () => {});
+
+// ✅ Seed data BEFORE app initialization
+beforeAll(async () => {
+  const factory = new EntityFactory([createEntityEntity()]);
+  const [entity] = await runFactories(factory);
+  testId = entity.id;
+  
+  moduleFixture = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
+  app = moduleFixture.createNestApplication();
+  await app.init();
+});
+
+// ✅ Explicitly set timestamps in repository
+async create(data: CreateDto): Promise<ResponseDto> {
+  const now = new Date();
+  const entity = this.repo.create({
+    ...data,
+    createdAt: now,
+    updatedAt: now,
+  });
+  const saved = await this.repo.save(entity);
+  return toObjectResponseMapper(saved, ResponseDto);
+}
+
+// ✅ Close all connections
 afterAll(async () => {
-  if (testId) {
-    try {
-      await request(app.getHttpServer()).delete(`/endpoint/${testId}`);
+  if (app) await app.close();
+  if (moduleFixture) await moduleFixture.close();
+});te(`/endpoint/${testId}`);
     } catch (error) {
       console.warn(`Cleanup failed for ${testId}:`, error);
     }
@@ -797,23 +1012,106 @@ npm run test:e2e -- --watch
 
 Before submitting e2e tests, ensure you've completed:
 
-- [ ] Created endpoint folder under `test/e2e/app/domain/[module]/`
-- [ ] Created or updated factory in `factories/[entity].factory.ts`
+### Setup & Structure
+- [ ] Created endpoint folder under `test/e2e/app/domain/[module]/[endpoint-name]/`
+- [ ] Created factory implementing `FactoryBuilder` in `factories/[entity].factory.ts`
+- [ ] Factory explicitly sets `createdAt` and `updatedAt` timestamps
 - [ ] Implemented test file following template structure
-- [ ] Added cleanup in `afterAll` hook for created data
+- [ ] Factory runs **BEFORE** app initialization in `beforeAll`
+- [ ] Both `app.close()` and `moduleFixture.close()` in `afterAll`
+
+### Test Coverage
 - [ ] Tested happy path scenarios
-- [ ] Tested validation errors (400)
+- [ ] Tested validation errors (400) - including negative/zero for positive fields
 - [ ] Tested not found errors (404)
-- [ ] Tested edge cases
-- [ ] Verified data types in responses
+- [ ] Tested edge cases and boundary conditions
+- [ ] Verified response data types
 - [ ] Tested pagination (if applicable)
 - [ ] Tested filtering (if applicable)
 - [ ] Tested relationships (if applicable)
-- [ ] Used factories instead of manual object construction
-- [ ] Added descriptive test names
-- [ ] Verified tests pass: `npm run test:e2e -- [test-file]`
+
+## Common Troubleshooting
+
+### Issue: Tests Timeout or Hang
+
+**Symptoms:** Tests don't complete, connection warnings
+
+**Solutions:**
+1. Verify factory runs BEFORE app initialization
+2. Check both `app.close()` and `moduleFixture.close()` are called
+3. Ensure cleanup is in try-catch blocks
+
+### Issue: "null value in column violates not-null constraint"
+
+**Symptoms:** 400 errors when creating entities, database constraint violations
+
+**Solutions:**
+1. **Check repository:** Explicitly set `createdAt` and `updatedAt` in create method
+2. **Check entity:** Use `@Generated('increment')` for auto-increment columns
+3. **Add debug logging:** Log response body to see which field is null
+
+```typescript
+// ✅ Fix in repository
+async create(data: CreateDto) {
+  const entity = this.repo.create({
+    ...data,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+  return await this.repo.save(entity);
+}
+
+// ✅ Fix in entity
+@Column({ name: 'aux_id' })
+@Generated('increment')
+auxId: number;
+```
+
+### Issue: Validation Tests Failing (negative/zero values accepted)
+
+**Symptoms:** Tests expect 400 but get 201 for invalid data
+
+**Solutions:**
+1. Add `@IsPositive()` to DTO for fields that must be > 0
+2. Add validation tests for boundary cases (0, negative, null)
+
+```typescript
+// ✅ Fix in DTO
+@IsNumber()
+@IsPositive() // Rejects 0 and negative values
+size: number;
+```
+
+### Issue: Factory Seeding Fails
+
+**Symptoms:** Cannot read property 'id' of undefined
+
+**Solutions:**
+1. Verify entity has all required fields
+2. Check database constraints match entity definition
+3. Ensure factory returns array: `const [entity] = await runFactories(factory)`
+
+## Real-World Example
+
+Here's a complete example from the assets module demonstrating all best practices:
+- [ ] Used `createEntityEntity()` for database seeding
+- [ ] Added descriptive test names (start with "should...")
+- [ ] Cleanup wrapped in try-catch with console.warn
 - [ ] No `synchronize: true` in test configuration
 - [ ] All created test data is cleaned up properly
+
+### Entity & Repository Configuration
+- [ ] Entity uses `@Generated('increment')` for auto-increment columns
+- [ ] Repository explicitly sets timestamps in create method
+- [ ] DTOs use `@IsPositive()` for positive number fields
+- [ ] Entity decorators match database schema constraints
+
+### Validation
+- [ ] Verified tests pass: `npm run test:e2e -- [test-file]`
+- [ ] No connection timeout warnings
+- [ ] No hanging processes after tests complete
+- [ ] Checked similar working tests (e.g., Business) for patterns
+- [ ] Removed any temporary debug logging
 
 ## Real-World Example
 
@@ -824,104 +1122,112 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '@/app.module';
-import { createBusinessPayload } from '../factories/business.factory';
+import { AssetFactory, createAssetEntity } from '../factories/asset.factory';
+import { runFactories } from '../../factories/builder.factory';
 
-describe('BusinessController - Update Business (e2e)', () => {
+describe('AssetsController - Get Asset by ID (e2e)', () => {
   let app: INestApplication;
-  let testBusinessId: number;
+  let moduleFixture: TestingModule;
+  let testAssetId: string;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+    // 1️⃣ FIRST: Seed data using factory builder BEFORE app initialization
+    const assetEntity = createAssetEntity({
+      path: 'uploads/test-get-asset.jpg',
+      size: 1536000,
+      initialName: 'test-get-asset.jpg',
+    });
+
+    const factory = new AssetFactory([assetEntity]);
+    const [createdAsset] = await runFactories(factory);
+
+    testAssetId = createdAsset.id;
+
+    // 2️⃣ THEN: Initialize NestJS app
+    moduleFixture = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
-
-    // Create test business using factory
-    const accountId = 1;
-    const newBusiness = createBusinessPayload({
-      title: 'Test Business for Updates',
-      description: 'Original description',
-    });
-
-    const createRes = await request(app.getHttpServer())
-      .post('/businesses')
-      .query({ accountId })
-      .send(newBusiness)
-      .expect(201);
-
-    testBusinessId = createRes.body.auxId;
   });
 
   afterAll(async () => {
-    // Clean up test business
-    if (testBusinessId) {
+    // Clean up test asset
+    if (testAssetId) {
       try {
         await request(app.getHttpServer())
-          .delete(`/businesses/${testBusinessId}`);
+          .delete(`/assets/${testAssetId}`);
       } catch (error) {
-        console.warn(`Failed to delete test business ${testBusinessId}:`, error);
+        console.warn(`Failed to delete test asset ${testAssetId}:`, error);
       }
     }
 
-    await app.close();
+    // CRITICAL: Close both app and moduleFixture
+    if (app) {
+      await app.close();
+    }
+
+    if (moduleFixture) {
+      await moduleFixture.close();
+    }
   });
 
-  describe('PUT /businesses/:id', () => {
-    it('should update business title', async () => {
-      const updateData = {
-        title: 'Updated Business Title',
-      };
-
+  describe('GET /assets/:id', () => {
+    it('should return correct response structure', async () => {
       const res = await request(app.getHttpServer())
-        .put(`/businesses/${testBusinessId}`)
-        .send(updateData)
+        .get(`/assets/${testAssetId}`)
         .expect(200);
 
-      expect(res.body.auxId).toBe(testBusinessId);
-      expect(res.body.title).toBe(updateData.title);
-
-      // Verify the update persisted
-      const getRes = await request(app.getHttpServer())
-        .get(`/businesses/${testBusinessId}`)
-        .expect(200);
-
-      expect(getRes.body.title).toBe(updateData.title);
+      expect(res.body).toHaveProperty('id');
+      expect(res.body).toHaveProperty('aux_id');
+      expect(res.body).toHaveProperty('path');
+      expect(res.body).toHaveProperty('size');
+      expect(res.body).toHaveProperty('initialName');
+      expect(res.body).toHaveProperty('createdAt');
+      expect(res.body).toHaveProperty('updatedAt');
     });
 
-    it('should preserve unchanged fields when updating', async () => {
-      const beforeRes = await request(app.getHttpServer())
-        .get(`/businesses/${testBusinessId}`)
-        .expect(200);
-
-      const originalDescription = beforeRes.body.description;
-      const originalCategoryId = beforeRes.body.categoryId;
-
-      const updateData = {
-        title: 'Partial Update Test',
-      };
-
+    it('should return data with correct types', async () => {
       const res = await request(app.getHttpServer())
-        .put(`/businesses/${testBusinessId}`)
-        .send(updateData)
+        .get(`/assets/${testAssetId}`)
         .expect(200);
 
-      expect(res.body.title).toBe(updateData.title);
-      expect(res.body.description).toBe(originalDescription);
-      expect(res.body.categoryId).toBe(originalCategoryId);
+      expect(typeof res.body.id).toBe('string');
+      expect(typeof res.body.aux_id).toBe('number');
+      expect(typeof res.body.path).toBe('string');
+      expect(typeof res.body.size).toBe('number');
+      expect(typeof res.body.createdAt).toBe('string');
+      expect(typeof res.body.updatedAt).toBe('string');
     });
 
-    it('should return 404 for non-existent business ID', async () => {
-      const nonExistentId = 999999;
-      const updateData = {
-        title: 'This should fail',
-      };
+    it('should return the correct asset by ID', async () => {
+      const res = await request(app.getHttpServer())
+        .get(`/assets/${testAssetId}`)
+        .expect(200);
+
+      expect(res.body.id).toBe(testAssetId);
+      expect(res.body.path).toBe('uploads/test-get-asset.jpg');
+      expect(res.body.size).toBe(1536000);
+      expect(res.body.initialName).toBe('test-get-asset.jpg');
+    });
+
+    it('should return 404 for non-existent asset ID', async () => {
+      const nonExistentId = '123e4567-e89b-12d3-a456-426614174000';
 
       const res = await request(app.getHttpServer())
-        .put(`/businesses/${nonExistentId}`)
-        .send(updateData)
+        .get(`/assets/${nonExistentId}`)
         .expect(404);
+
+      expect(res.body).toHaveProperty('message');
+    });
+
+    it('should validate ID parameter is a valid UUID', async () => {
+      const invalidId = 'not-a-uuid';
+
+      const res = await request(app.getHttpServer())
+        .get(`/assets/${invalidId}`)
+        .expect(400);
 
       expect(res.body).toHaveProperty('message');
     });
