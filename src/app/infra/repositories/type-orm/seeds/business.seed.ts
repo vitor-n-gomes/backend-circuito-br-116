@@ -47,7 +47,7 @@ export class BusinessSeed {
       {
         title: 'Restaurante Sabor da Serra',
         description: 'Restaurante tradicional com comida caseira e vista panorâmica da BR-116. Especialidades: feijoada completa, moqueca capixaba e frango caipira.',
-        category_id: getRandomCategoryId(),
+        categoryId: getRandomCategoryId(),
         locationId: getLocationByName('Registro - SP').aux_id,
         locationPretty: 'Km 235, Registro - SP',
         locationLat: -24.4897,
@@ -68,7 +68,7 @@ export class BusinessSeed {
       {
         title: 'Churrascaria Boi na Brasa',
         description: 'Churrascaria com rodízio completo. Carnes nobres, buffet variado e espaço kids.',
-        category_id: getRandomCategoryId(),
+        categoryId: getRandomCategoryId(),
         locationId: getLocationByName('Curitiba - PR').aux_id,
         locationPretty: 'Km 312, Curitiba - PR',
         locationLat: -25.4284,
@@ -88,7 +88,7 @@ export class BusinessSeed {
       {
         title: 'Pizzaria Forno a Lenha',
         description: 'Pizzas artesanais com massa fermentada naturalmente. Delivery e salão climatizado.',
-        category_id: getRandomCategoryId(),
+        categoryId: getRandomCategoryId(),
         locationId: getLocationByName('Florianópolis - SC').aux_id,
         locationPretty: 'Km 428, Florianópolis - SC',
         locationLat: -27.5954,
@@ -108,7 +108,7 @@ export class BusinessSeed {
       {
         title: 'Hotel Estrada Real',
         description: 'Hotel executivo com 50 apartamentos, wifi gratuito, estacionamento amplo e café da manhã incluso. Ideal para viajantes de negócios.',
-        category_id: getRandomCategoryId(),
+        categoryId: getRandomCategoryId(),
         locationId: getLocationByName('Cajati - SP').aux_id,
         locationPretty: 'Km 187, Cajati - SP',
         locationLat: -24.7297,
@@ -129,7 +129,7 @@ export class BusinessSeed {
       {
         title: 'Pousada Caminho da Serra',
         description: 'Pousada aconchegante com vista para as montanhas. Quartos com varanda, piscina e área verde.',
-        category_id: getRandomCategoryId(),
+        categoryId: getRandomCategoryId(),
         locationId: getLocationByName('Morretes - PR').aux_id,
         locationPretty: 'Km 268, Morretes - PR',
         locationLat: -25.4744,
@@ -150,7 +150,7 @@ export class BusinessSeed {
       {
         title: 'Posto BR - Auto Posto Rodoviário',
         description: 'Posto de combustível com conveniência 24h, borracharia, lavagem e restaurante. Aceita todos os cartões.',
-        category_id: getRandomCategoryId(),
+        categoryId: getRandomCategoryId(),
         locationId: getLocationByName('São José dos Pinhais - PR').aux_id,
         locationPretty: 'Km 352, São José dos Pinhais - PR',
         locationLat: -25.5304,
@@ -168,7 +168,7 @@ export class BusinessSeed {
       {
         title: 'Shell Select',
         description: 'Combustíveis Shell V-Power, loja de conveniência, café, banheiros limpos e área de descanso.',
-        category_id: getRandomCategoryId(),
+        categoryId: getRandomCategoryId(),
         locationId: getLocationByName('Garuva - SC').aux_id,
         locationPretty: 'Km 405, Garuva - SC',
         locationLat: -26.0272,
@@ -188,7 +188,7 @@ export class BusinessSeed {
       {
         title: 'Auto Mecânica Rodoviária',
         description: 'Serviços de mecânica geral, elétrica automotiva, alinhamento e balanceamento. Atendimento de emergência 24h.',
-        category_id: getRandomCategoryId(),
+        categoryId: getRandomCategoryId(),
         locationId: getLocationByName('Curitiba - PR').aux_id,
         locationPretty: 'Km 289, Curitiba - PR',
         locationLat: -25.4195,
@@ -206,7 +206,7 @@ export class BusinessSeed {
       {
         title: 'Borracharia Expresso',
         description: 'Borracharia especializada em pneus de caminhão e automóveis. Conserto de câmaras e vendas.',
-        category_id: getRandomCategoryId(),
+        categoryId: getRandomCategoryId(),
         locationId: getLocationByName('Jacupiranga - SP').aux_id,
         locationPretty: 'Km 198, Jacupiranga - SP',
         locationLat: -24.6942,
@@ -225,7 +225,7 @@ export class BusinessSeed {
       {
         title: 'Parque Estadual Pico do Marumbi',
         description: 'Parque estadual com trilhas ecológicas, mirantes naturais e rica biodiversidade. Guias disponíveis.',
-        category_id: getRandomCategoryId(),
+        categoryId: getRandomCategoryId(),
         locationId: getLocationByName('Morretes - PR').aux_id,
         locationPretty: 'Km 274, Morretes - PR',
         locationLat: -25.4333,
@@ -243,7 +243,7 @@ export class BusinessSeed {
       {
         title: 'Museu Ferroviário de Morretes',
         description: 'Museu dedicado à história da ferrovia paranaguá-curitiba. Exposição de locomotivas antigas.',
-        category_id: getRandomCategoryId(),
+        categoryId: getRandomCategoryId(),
         locationId: getLocationByName('Morretes - PR').aux_id,
         locationPretty: 'Centro, Morretes - PR',
         locationLat: -25.4744,
@@ -261,7 +261,7 @@ export class BusinessSeed {
       {
         title: 'Shopping Rodoviário BR-116',
         description: 'Centro comercial com lojas variadas, praça de alimentação, cinema e estacionamento gratuito.',
-        category_id: getRandomCategoryId(),
+        categoryId: getRandomCategoryId(),
         locationId: getLocationByName('Curitiba - PR').aux_id,
         locationPretty: 'Km 338, Curitiba - PR',
         locationLat: -25.4808,
@@ -282,7 +282,7 @@ export class BusinessSeed {
       {
         title: 'Lanchonete e Pastelaria da Estrada',
         description: 'Lanches rápidos, pastéis fritos na hora e sucos naturais. Ambiente simples e familiar.',
-        category_id: getRandomCategoryId(),
+        categoryId: getRandomCategoryId(),
         locationId: getLocationByName('Pariquera-Açu - SP').aux_id,
         locationPretty: 'Km 221, Pariquera-Açu - SP',
         locationLat: -24.7156,
@@ -298,7 +298,7 @@ export class BusinessSeed {
       {
         title: 'Mercado do Agricultor',
         description: 'Produtos orgânicos direto do produtor. Frutas, verduras, legumes e queijos artesanais.',
-        category_id: getRandomCategoryId(),
+        categoryId: getRandomCategoryId(),
         locationId: getLocationByName('Antonina - PR').aux_id,
         locationPretty: 'Km 255, Antonina - PR',
         locationLat: -25.4286,
@@ -314,7 +314,7 @@ export class BusinessSeed {
       {
         title: 'Farmácia 24 Horas Saúde Total',
         description: 'Farmácia com atendimento 24h, delivery, medição de pressão e glicemia gratuita.',
-        category_id: getRandomCategoryId(),
+        categoryId: getRandomCategoryId(),
         locationId: getLocationByName('São José dos Pinhais - PR').aux_id,
         locationPretty: 'Km 365, São José dos Pinhais - PR',
         locationLat: -25.5347,

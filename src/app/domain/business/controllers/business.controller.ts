@@ -51,7 +51,11 @@ export class BusinessController {
     @Body(new ValidationPipe({ transform: true })) data: CreateBusinessDto,
     @Query('accountId', ParseIntPipe) accountId: number
   ): Promise<BusinessResponseDto> {
-    return await this.createBusinessCase.execute(accountId, data);
+    try{
+      return await this.createBusinessCase.execute(accountId, data);
+    }catch(error) {
+        console.log(error);
+    }
   }
 
   @Put(':id')

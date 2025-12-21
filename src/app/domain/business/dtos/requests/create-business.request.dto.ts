@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber, IsOptional, IsEmail, IsBoolean, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsOptional, IsEmail, IsBoolean, MaxLength, Min, Max } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateBusinessDto {
@@ -28,17 +28,21 @@ export class CreateBusinessDto {
   @ApiProperty({ description: 'Latitude coordinate', example: -23.5505 })
   @IsNumber()
   @IsNotEmpty()
+  @Min(-90)
+  @Max(90)
   locationLat: number;
 
   @ApiProperty({ description: 'Longitude coordinate', example: -46.6333 })
   @IsNumber()
   @IsNotEmpty()
+  @Min(-180)
+  @Max(180)
   locationLong: number;
 
   @ApiProperty({ description: 'Category ID', example: 1 })
   @IsNumber()
   @IsNotEmpty()
-  category_id: number;
+  categoryId: number;
 
   @ApiProperty({ description: 'Classification code', example: 'A1', required: false })
   @IsString()

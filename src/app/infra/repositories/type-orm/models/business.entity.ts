@@ -62,7 +62,7 @@ export class Business {
   tiktok: string;
 
   @Column({ name: 'category_id', type: 'integer' })
-  category_id: number;
+  categoryId: number;
 
   @Column({ type: 'varchar', length: 2 })
   classification: string;

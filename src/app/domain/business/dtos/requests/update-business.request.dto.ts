@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsNumber, IsEmail, IsBoolean, MaxLength } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsEmail, IsBoolean, MaxLength, Min, Max } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateBusinessDto {
@@ -23,17 +23,21 @@ export class UpdateBusinessDto {
   @ApiProperty({ description: 'Latitude coordinate', example: -23.5505, required: false })
   @IsNumber()
   @IsOptional()
+  @Min(-90)
+  @Max(90)
   locationLat?: number;
 
   @ApiProperty({ description: 'Longitude coordinate', example: -46.6333, required: false })
   @IsNumber()
   @IsOptional()
+  @Min(-180)
+  @Max(180)
   locationLong?: number;
 
   @ApiProperty({ description: 'Category ID', example: 1, required: false })
   @IsNumber()
   @IsOptional()
-  category_id?: number;
+  categoryId?: number
 
   @ApiProperty({ description: 'Classification code', example: 'A1', required: false })
   @IsString()

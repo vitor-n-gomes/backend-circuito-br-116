@@ -113,11 +113,14 @@ export class BusinessRepository implements IBusinessRepository {
   }
 
   async create(accountId: number, data: CreateBusinessDto): Promise<BusinessResponseDto> {
+    const now = new Date();
     const business = this.businessRepo.create({
       ...data,
       accountId,
       views: 0,
       isVerified: false,
+      createdAt: now,
+      updatedAt: now,
     });
 
     const saved = await this.businessRepo.save(business);
