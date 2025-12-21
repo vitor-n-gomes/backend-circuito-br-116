@@ -23,16 +23,16 @@ export class CategoryRepository implements ICategoryRepository {
   }
 
   async findAllWithBusinessCount(): Promise<CategoryResponseDto[]> {
-    // Simple implementation - can be enhanced with actual business count query
+    // Query categories with business count using subquery
     const categories = await this.categoryRepo
-      .createQueryBuilder('c')
-      .leftJoinAndSelect('c.parentCategory', 'parent')
-      .orderBy('c.createdAt', 'ASC')
+      .createQueryBuilder('category')
+      .loadRelationCountAndMap('category.businessCount', 'category.businesses')
+      .orderBy('category.createdAt', 'ASC')
       .getMany();
 
-    return categories.map((cat) => {
+    return categories.map((cat: any) => {
       const dto = toObjectResponseMapper(cat, CategoryResponseDto);
-      dto.businessCount = 0; // TODO: Add actual count from businesses table
+      dto.businessCount = cat.businessCount || 0;
       return dto;
     });
   }
