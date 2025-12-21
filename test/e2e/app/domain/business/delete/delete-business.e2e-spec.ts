@@ -4,16 +4,16 @@ import * as request from 'supertest';
 import { AppModule } from '@/app.module';
 import { BusinessFactory } from '../factories/business.factory';
 import { runFactories } from '../../factories/builder.factory';
-import { businesses } from './mocks/business.mock';
+import { listOfBusinessTest } from './mocks/delete-business.mock';
 
 describe('BusinessController - Delete Business (e2e)', () => {
   let app: INestApplication;
   let moduleFixture: TestingModule;
-  let createdBusinessIds: number[] = [];
   let listOfBusiness: any[] = [];
 
   beforeAll(async () => {
-    const mockData = new BusinessFactory(businesses);
+
+    const mockData = new BusinessFactory(listOfBusinessTest);
 
     const results = await runFactories(mockData);
     listOfBusiness = results.flat();
@@ -27,20 +27,11 @@ describe('BusinessController - Delete Business (e2e)', () => {
   });
 
   afterAll(async () => {
-    // Clean up any remaining created businesses
-    for (const id of createdBusinessIds) {
-      try {
-        await request(app.getHttpServer())
-          .delete(`/businesses/${id}`);
-      } catch (error) {
-        console.warn(`Failed to delete business ${id}:`, error);
-      }
-    }
 
     if (app) {
       await app.close();
     }
-    
+
     if (moduleFixture) {
       await moduleFixture.close();
     }
