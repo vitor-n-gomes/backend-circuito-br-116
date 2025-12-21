@@ -20,4 +20,4 @@ import { AccountsModule } from "./accounts/accounts.module";
     AccountsModule,
   ],
 })
-export class HomeModule {}
+export class DomainModule {}

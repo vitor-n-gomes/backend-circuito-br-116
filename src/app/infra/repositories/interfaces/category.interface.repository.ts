@@ -1,5 +1,5 @@
-import { CategoryResponseDto } from '../../../home/categories/dtos/responses/category.response.dto';
-import { CreateCategoryDto } from '../../../home/categories/dtos/requests/create-category.request.dto';
+import { CategoryResponseDto } from '../../../domain/categories/dtos/responses/category.response.dto';
+import { CreateCategoryDto } from '../../../domain/categories/dtos/requests/create-category.request.dto';
 
 export abstract class ICategoryRepository {
   abstract findAll(): Promise<CategoryResponseDto[]>;

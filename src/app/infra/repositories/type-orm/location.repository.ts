@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Location } from './models/location.entity';
 import { ILocationRepository } from '../interfaces/location.interface.repository';
-import { LocationResponseDto } from '@/app/home/location/dtos/responses/location.response.dto';
-import { CreateLocationDto } from '@/app/home/location/dtos/requests/create-location.request.dto';
+import { LocationResponseDto } from '@/app/domain/location/dtos/responses/location.response.dto';
+import { CreateLocationDto } from '@/app/domain/location/dtos/requests/create-location.request.dto';
 import { toObjectResponseMapper } from './mappers/to-object-response.mapper';
 
 @Injectable()

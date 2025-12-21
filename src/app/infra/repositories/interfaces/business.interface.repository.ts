@@ -1,8 +1,8 @@
 import { PaginationResponseDto } from '@/common/utils/dtos/responses/pagination.response.dto';
-import { FilterBusinessDto } from '../../../home/business/dtos/requests/filter-business.request.dto';
-import { BusinessResponseDto } from '../../../home/business/dtos/responses/business.response.dto';
-import { CreateBusinessDto } from '../../../home/business/dtos/requests/create-business.request.dto';
-import { UpdateBusinessDto } from '../../../home/business/dtos/requests/update-business.request.dto';
+import { FilterBusinessDto } from '../../../domain/business/dtos/requests/filter-business.request.dto';
+import { BusinessResponseDto } from '../../../domain/business/dtos/responses/business.response.dto';
+import { CreateBusinessDto } from '../../../domain/business/dtos/requests/create-business.request.dto';
+import { UpdateBusinessDto } from '../../../domain/business/dtos/requests/update-business.request.dto';
 
 export abstract class IBusinessRepository {
   abstract findById(id: number): Promise<BusinessResponseDto | null>;

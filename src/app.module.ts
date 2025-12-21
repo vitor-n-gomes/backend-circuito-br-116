@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { HomeModule } from "./app/home/home.module";
+import { DomainModule } from "./app/domain/domain.module";
 import { InfraModule } from "./app/infra/infra.module";
 
 @Module({
@@ -9,7 +9,7 @@ import { InfraModule } from "./app/infra/infra.module";
       isGlobal: true,
     }),
     InfraModule,
-    HomeModule,
+    DomainModule,
   ],
 })
 export class AppModule {}

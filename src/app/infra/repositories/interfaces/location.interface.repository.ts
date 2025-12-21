@@ -1,5 +1,5 @@
-import { LocationResponseDto } from '../../../home/location/dtos/responses/location.response.dto';
-import { CreateLocationDto } from '../../../home/location/dtos/requests/create-location.request.dto';
+import { LocationResponseDto } from '../../../domain/location/dtos/responses/location.response.dto';
+import { CreateLocationDto } from '../../../domain/location/dtos/requests/create-location.request.dto';
 
 export abstract class ILocationRepository {
   abstract findAll(): Promise<LocationResponseDto[]>;

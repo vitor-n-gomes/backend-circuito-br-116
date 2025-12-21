@@ -1,5 +1,5 @@
-import { CommentResponseDto } from '../../../home/comments/dtos/responses/comment.response.dto';
-import { CreateCommentDto } from '../../../home/comments/dtos/requests/create-comment.request.dto';
+import { CommentResponseDto } from '../../../domain/comments/dtos/responses/comment.response.dto';
+import { CreateCommentDto } from '../../../domain/comments/dtos/requests/create-comment.request.dto';
 
 export abstract class ICommentRepository {
   abstract findById(id: string): Promise<CommentResponseDto | null>;

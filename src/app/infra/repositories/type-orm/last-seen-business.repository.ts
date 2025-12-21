@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LastSeenBusiness } from './models/last-seen-business.entity';
 import { ILastSeenBusinessRepository } from '../interfaces/last-seen-business.interface.repository';
-import { LastSeenBusinessResponseDto } from '@/app/home/last-seen-business/dtos/responses/last-seen-business.response.dto';
-import { CreateLastSeenBusinessDto } from '@/app/home/last-seen-business/dtos/requests/create-last-seen-business.request.dto';
+import { LastSeenBusinessResponseDto } from '@/app/domain/last-seen-business/dtos/responses/last-seen-business.response.dto';
+import { CreateLastSeenBusinessDto } from '@/app/domain/last-seen-business/dtos/requests/create-last-seen-business.request.dto';
 import { toObjectResponseMapper } from './mappers/to-object-response.mapper';
 
 @Injectable()

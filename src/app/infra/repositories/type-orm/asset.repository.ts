@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Asset } from './models/asset.entity';
 import { IAssetRepository } from '../interfaces/asset.interface.repository';
-import { AssetResponseDto } from '@/app/home/assets/dtos/responses/asset.response.dto';
-import { CreateAssetDto } from '@/app/home/assets/dtos/requests/create-asset.request.dto';
+import { AssetResponseDto } from '@/app/domain/assets/dtos/responses/asset.response.dto';
+import { CreateAssetDto } from '@/app/domain/assets/dtos/requests/create-asset.request.dto';
 import { toObjectResponseMapper } from './mappers/to-object-response.mapper';
 
 @Injectable()

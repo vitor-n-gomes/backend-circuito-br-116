@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from './models/comment.entity';
 import { ICommentRepository } from '../interfaces/comment.interface.repository';
-import { CommentResponseDto } from '@/app/home/comments/dtos/responses/comment.response.dto';
-import { CreateCommentDto } from '@/app/home/comments/dtos/requests/create-comment.request.dto';
+import { CommentResponseDto } from '@/app/domain/comments/dtos/responses/comment.response.dto';
+import { CreateCommentDto } from '@/app/domain/comments/dtos/requests/create-comment.request.dto';
 import { toObjectResponseMapper } from './mappers/to-object-response.mapper';
 
 @Injectable()

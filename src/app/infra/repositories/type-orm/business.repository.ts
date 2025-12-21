@@ -3,13 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike, In, LessThanOrEqual, MoreThanOrEqual, IsNull, Not } from 'typeorm';
 import { Business } from './models/business.entity';
 import { IBusinessRepository } from '../interfaces/business.interface.repository';
-import { FilterBusinessDto } from '../../../home/business/dtos/requests/filter-business.request.dto';
+import { FilterBusinessDto } from '../../../domain/business/dtos/requests/filter-business.request.dto';
 import { PaginationResponseDto } from '@/common/utils/dtos/responses/pagination.response.dto';
 import { toPaginationResponseMapper } from './mappers/to-pagination-response.mapper';
 import { toObjectResponseMapper } from './mappers/to-object-response.mapper';
-import { BusinessResponseDto } from '@/app/home/business/dtos/responses/business.response.dto';
-import { CreateBusinessDto } from '@/app/home/business/dtos/requests/create-business.request.dto';
-import { UpdateBusinessDto } from '@/app/home/business/dtos/requests/update-business.request.dto';
+import { BusinessResponseDto } from '@/app/domain/business/dtos/responses/business.response.dto';
+import { CreateBusinessDto } from '@/app/domain/business/dtos/requests/create-business.request.dto';
+import { UpdateBusinessDto } from '@/app/domain/business/dtos/requests/update-business.request.dto';
 
 @Injectable()
 export class BusinessRepository implements IBusinessRepository {

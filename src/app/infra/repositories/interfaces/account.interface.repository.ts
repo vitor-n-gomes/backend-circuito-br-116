@@ -1,6 +1,6 @@
-import { AccountResponseDto } from '../../../home/accounts/dtos/responses/account.response.dto';
-import { CreateAccountDto } from '../../../home/accounts/dtos/requests/create-account.dto';
-import { UpdateAccountDto } from '../../../home/accounts/dtos/requests/update-account.dto';
+import { AccountResponseDto } from '../../../domain/accounts/dtos/responses/account.response.dto';
+import { CreateAccountDto } from '../../../domain/accounts/dtos/requests/create-account.dto';
+import { UpdateAccountDto } from '../../../domain/accounts/dtos/requests/update-account.dto';
 
 export interface AccountStatsDto {
   businesses: number;

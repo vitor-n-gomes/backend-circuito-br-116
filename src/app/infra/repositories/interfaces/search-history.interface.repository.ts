@@ -1,5 +1,5 @@
-import { SearchHistoryResponseDto } from '../../../home/search-history/dtos/responses/search-history.response.dto';
-import { CreateSearchHistoryDto } from '../../../home/search-history/dtos/requests/create-search-history.request.dto';
+import { SearchHistoryResponseDto } from '../../../domain/search-history/dtos/responses/search-history.response.dto';
+import { CreateSearchHistoryDto } from '../../../domain/search-history/dtos/requests/create-search-history.request.dto';
 
 export abstract class ISearchHistoryRepository {
   abstract findByAccountId(accountId: string, limit?: number): Promise<SearchHistoryResponseDto[]>;

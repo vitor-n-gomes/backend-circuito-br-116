@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Category } from './models/category.entity';
 import { ICategoryRepository } from '../interfaces/category.interface.repository';
-import { CategoryResponseDto } from '@/app/home/categories/dtos/responses/category.response.dto';
-import { CreateCategoryDto } from '@/app/home/categories/dtos/requests/create-category.request.dto';
+import { CategoryResponseDto } from '@/app/domain/categories/dtos/responses/category.response.dto';
+import { CreateCategoryDto } from '@/app/domain/categories/dtos/requests/create-category.request.dto';
 import { toObjectResponseMapper } from './mappers/to-object-response.mapper';
 
 @Injectable()

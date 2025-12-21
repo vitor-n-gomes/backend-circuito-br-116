@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SearchHistory } from './models/search-history.entity';
 import { ISearchHistoryRepository } from '../interfaces/search-history.interface.repository';
-import { SearchHistoryResponseDto } from '@/app/home/search-history/dtos/responses/search-history.response.dto';
-import { CreateSearchHistoryDto } from '@/app/home/search-history/dtos/requests/create-search-history.request.dto';
+import { SearchHistoryResponseDto } from '@/app/domain/search-history/dtos/responses/search-history.response.dto';
+import { CreateSearchHistoryDto } from '@/app/domain/search-history/dtos/requests/create-search-history.request.dto';
 import { toObjectResponseMapper } from './mappers/to-object-response.mapper';
 
 @Injectable()

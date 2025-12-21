@@ -20,7 +20,7 @@
 ```
 src/
 ├── app/
-│   ├── home/               # Domain modules (business logic)
+│   ├── domain/               # Domain modules (business logic)
 │   │   └── contact/        # Contact domain
 │   │       ├── controllers/
 │   │       ├── use-cases/  # Business logic use cases
@@ -39,7 +39,7 @@ src/
 ```
 
 ### Module Organization
-- **Domain Modules** (`src/app/home`): Business logic organized by feature
+- **Domain Modules** (`src/app/domain`): Business logic organized by feature
   - Controllers handle HTTP requests
   - Use cases contain business logic
   - DTOs define data contracts
@@ -129,11 +129,11 @@ export class PaginateContactsByFilterCase {
 
 ### Import Consistency
 - Infrastructure interfaces: Use `@/` alias or relative paths consistently
-- Domain DTOs: Use relative paths from infrastructure layer (e.g., `../../../home/contact/dtos/`)
+- Domain DTOs: Use relative paths from infrastructure layer (e.g., `../../../domain/contact/dtos/`)
 - Common utilities: Always use `@/common/...`
 
 ### Module Structure
-1. Create feature modules in `src/app/home/[feature-name]/`
+1. Create feature modules in `src/app/domain/[feature-name]/`
 2. Implement use cases for business logic
 3. Define DTOs for requests/responses with validation decorators
 4. Create controllers that inject and call use cases
@@ -246,7 +246,7 @@ describe('ComponentName', () => {
 ## Common Tasks
 
 ### Adding a New Feature Module
-1. Create directory: `src/app/home/[feature-name]/`
+1. Create directory: `src/app/domain/[feature-name]/`
 2. Add subdirectories: `controllers/`, `use-cases/`, `dtos/`
 3. Create DTOs with validation decorators
 4. Create use cases with business logic
@@ -260,7 +260,7 @@ describe('ComponentName', () => {
    })
    export class FeatureModule {}
    ```
-7. Import in `home.module.ts`
+7. Import in `domain.module.ts`
 
 ### Adding a New Repository
 1. Define interface in `src/app/infra/repositories/interfaces/[entity].interface.repository.ts`
@@ -321,10 +321,10 @@ export class CreateContactDto {
 - Always use dependency injection with abstract classes for repositories
 - Follow the repository pattern with interfaces in `interfaces/` and implementations in `type-orm/`
 - Use mappers (`toObjectResponseMapper`, `toPaginationResponseMapper`) to transform entities to DTOs
-- Maintain separation between domain logic (use cases in `home/`) and infrastructure (repositories in `infra/`)
+- Maintain separation between domain logic (use cases in `domain/`) and infrastructure (repositories in `infra/`)
 - Reference existing patterns in `ContactRepository` and `PaginateContactsByFilterCase`
 - Use `@/` path alias for imports from `src/` when possible
-- When creating new features, follow the structure in `src/app/home/contact/`
+- When creating new features, follow the structure in `src/app/domain/contact/`
 - Always validate DTOs with `class-validator` decorators
 - Document APIs with Swagger decorators
 - Write tests for all business logic (use cases) and API endpoints (controllers)
