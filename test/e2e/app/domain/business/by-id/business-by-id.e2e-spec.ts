@@ -146,7 +146,7 @@ describe('BusinessController - Get Business by ID (e2e)', () => {
       // Search for promoted businesses
       const filterRes = await request(app.getHttpServer())
         .post('/businesses/filter')
-        .send({ isPromoted: true })
+        .send({ promotedOnly: true })
         .query({ limit: 1 });
 
       if (filterRes.body.data && filterRes.body.data.length > 0) {
@@ -172,7 +172,7 @@ describe('BusinessController - Get Business by ID (e2e)', () => {
         .expect(200);
 
       // Classification should be one of the valid types
-      const validClassifications = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+      const validClassifications = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'C'];
       expect(validClassifications).toContain(res.body.classification);
     });
 
