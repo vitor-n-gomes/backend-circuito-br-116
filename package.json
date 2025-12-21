@@ -19,6 +19,7 @@
       "test:cov": "jest --coverage",
       "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
       "test:e2e": "NODE_ENV=test jest --config jest-e2e.config.js --silent --maxWorkers=50%",
+      "seed": "ts-node -r tsconfig-paths/register src/app/infra/repositories/type-orm/seeds/seed.ts",
       "typeorm": "ts-node ./node_modules/typeorm/cli.js",
       "migration:generate": "typeorm migration:generate -d ./src/migration",
       "migration:run": "typeorm migration:run",
@@ -44,6 +45,7 @@
       "uuid": "^11.1.0"
    },
    "devDependencies": {
+      "@faker-js/faker": "^8.4.1",
       "@nestjs/cli": "^11.0.0",
       "@nestjs/schematics": "^11.0.0",
       "@nestjs/testing": "^11.0.0",
