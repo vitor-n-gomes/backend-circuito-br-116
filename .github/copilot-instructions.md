@@ -11,6 +11,8 @@
 - **Development server:** `npm run start:dev` or `yarn start:dev`
 - **Production build:** `npm run build` + `npm run start:prod`
 - **Unit tests:** `npm run test`
+- **Integration tests:** `npm run test:integration` - Tests use case → repository → database
+- **Integration tests (watch):** `npm run test:integration:watch`
 - **E2E tests:** `npm run test:e2e` (uses `jest-e2e.config.js`)
 - **Coverage:** `npm run test:cov` (output in `coverage/`)
 
@@ -116,9 +118,18 @@ export class PaginateContactsByFilterCase {
   - Location: `test/unit/`
   - Mock factories in `mocks/` directories
   - Follow AAA pattern (Arrange, Act, Assert)
-- **E2E tests:** Test full request-response cycle
-  - Location: `test/e2e/`
-  - Uses actual database connections
+- **Integration tests:** Test from use case through repository to actual database
+  - Location: `test/integration/`
+  - Configuration: `test/jest-integration.json`
+  - Uses real database connection (AWS RDS)
+  - Tests repository implementations and database operations
+  - Environment setup in `test/integration/setup.ts`
+- **E2E tests:** Test full HTTP request-response cycle
+  - Location: `test/e2e/app/domain/[module]/[endpoint]/`
+  - Uses actual database connections (production database - **READ ONLY**)
+  - Each endpoint has its own folder (e.g., `test/e2e/app/domain/business/latest/`)
+  - **CRITICAL:** Never use `synchronize: true` in e2e tests - will destroy production schema
+  - Follow pattern: test structure, validate data types, test business logic, handle edge cases
 
 ## Conventions & Best Practices
 
@@ -218,6 +229,97 @@ describe('ComponentName', () => {
 });
 ```
 
+### Integration Test Structure
+```typescript
+import { Test, TestingModule } from '@nestjs/testing';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
+
+describe('Repository Integration Tests', () => {
+  let module: TestingModule;
+  let repository: IRepository;
+  let typeOrmRepository: Repository<Entity>;
+
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
+      imports: [
+        ConfigModule.forRoot({
+          envFilePath: ['.env.test', '.env'],
+          isGlobal: true,
+        }),
+        TypeOrmModule.forRoot({
+          type: 'postgres',
+          host: process.env.DB_HOST,
+          port: parseInt(process.env.DB_PORT || '5432'),
+          username: process.env.DB_USER,
+          password: process.env.DB_PASS,
+          database: process.env.DB_NAME,
+          entities: ['src/app/infra/repositories/type-orm/models/**/*.entity.{ts,js}'],
+          synchronize: false,
+          logging: false,
+          ssl: process.env.DB_HOST?.includes('rds.amazonaws.com')
+            ? { rejectUnauthorized: false }
+            : false,
+        }),
+        TypeOrmModule.forFeature([Entity]),
+      ],
+      providers: [
+        { provide: IRepository, useClass: RepositoryImpl },
+      ],
+    }).compile();
+
+    repository = module.get<IRepository>(IRepository);
+    typeOrmRepository = module.get('EntityRepository');
+  });
+
+  afterAll(async () => {
+    if (module) await module.close();
+  });
+
+  beforeEach(async () => {
+    // Clean up test data
+    await typeOrmRepository.createQueryBuilder().delete().execute();
+  });
+
+  it('should test repository method', async () => {
+    // Test implementation
+  });
+});
+```
+
+### E2E Test Structure
+```typescript
+import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
+import * as request from 'supertest';
+import { AppModule } from '@/app.module';
+
+describe('Endpoint E2E Tests', () => {
+  let app: INestApplication;
+
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    await app.init();
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
+
+  it('should test endpoint', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/endpoint')
+      .expect(200);
+
+    expect(res.body).toHaveProperty('property');
+  });
+});
+```
+
 ### Mock Data Organization
 - Create factories for entity mocks in `test/unit/.../mocks/`
 - Factory example: `contact.factory.ts`
@@ -226,6 +328,7 @@ describe('ComponentName', () => {
 
 ## Environment Configuration
 - Copy `.env.example` to `.env` before running
+- For integration tests, use `.env.test` or `.env`
 - Required variables:
   ```env
   # Server
@@ -274,7 +377,20 @@ describe('ComponentName', () => {
 
 ### Creating Tests
 - **Unit tests:** `test/unit/app/[module]/[component].spec.ts`
-- **E2E tests:** `test/e2e/app/[module]/[feature].e2e-spec.ts`
+- **Integration tests:** `test/integration/[module]/[feature].integration.spec.ts`
+  - Test repository methods with real database
+  - Use `beforeEach` to clean up test data: `await repository.createQueryBuilder().delete().execute()`
+  - Load all entities using glob pattern: `entities: ['src/app/infra/repositories/type-orm/models/**/*.entity.{ts,js}']`
+  - Include ConfigModule for environment variables
+  - Set appropriate timeout (60000ms recommended)
+- **E2E tests:** `test/e2e/app/domain/[module]/[endpoint]/[feature].e2e-spec.ts`
+  - Each endpoint gets its own folder (e.g., `business/latest/`, `business/search/`)
+  - Import `AppModule` and use `supertest` for HTTP requests
+  - **Production database safety:**
+    - Use read-only operations when possible
+    - Never use `synchronize: true`
+    - Clean up any created test data in `afterAll` hooks
+    - Test with existing production data
 - Use existing mock factories and patterns
 - Follow AAA pattern (Arrange, Act, Assert)
 - Mock all external dependencies in unit tests
