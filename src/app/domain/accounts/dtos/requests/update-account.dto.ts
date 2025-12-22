@@ -7,11 +7,6 @@ export class UpdateAccountDto {
   @IsOptional()
   name?: string;
 
-  @ApiProperty({ description: 'Location coordinates [lat, lng]', example: '[-23.5505, -46.6333]', required: false })
-  @IsString()
-  @IsOptional()
-  locationLatLng?: string;
-
   @ApiProperty({ description: 'Location description', example: 'São Paulo, SP', required: false })
   @IsString()
   @IsOptional()
@@ -72,8 +67,7 @@ export class UpdateAccountDto {
   @IsOptional()
   locationLat?: number;
 
-  @ApiProperty({ description: 'Location longitude', example: -46.6333, required: false })
-  @IsNumber()
+  @ApiProperty({ description: 'Location longitude (JSON)', example: -46.6333, required: false })
   @IsOptional()
-  locationLong?: number;
+  locationLong?: any;
 }

@@ -75,9 +75,7 @@ export class AccountRepository implements IAccountRepository {
       .createQueryBuilder('account')
       .leftJoinAndSelect('account.asset', 'asset')
       .where('account.name ILIKE :query OR account.email ILIKE :query', { query: `%${query}%` })
-      .orderBy(`POSITION(:rawQuery IN account.name)`, 'DESC')
-      .addOrderBy('account.name', 'DESC')
-      .setParameter('rawQuery', query)
+      .orderBy('account.name', 'ASC')
       .skip(page * perPage)
       .take(perPage);
 
@@ -179,35 +177,16 @@ export class AccountRepository implements IAccountRepository {
       throw new Error('Account not found');
     }
 
-    // Parse locationLatLng if provided
-    let locationLat = data.locationLat;
-    let locationLong = data.locationLong;
-    if (data.locationLatLng) {
-      try {
-        const [lat, lng] = JSON.parse(data.locationLatLng);
-        locationLat = lat;
-        locationLong = lng;
-      } catch (error) {
-        // Invalid JSON, skip
-      }
+    const updateData: Partial<Account> = { ...data };
+    if (data.meta) {
+      updateData.meta = { ...account.meta, ...data.meta };
     }
 
-    // Merge metadata
-    const meta = data.meta ? { ...account.meta, ...data.meta } : account.meta;
-
-    await this.repository.update(
-      { id },
-      {
-        ...data,
-        locationLat,
-        locationLong,
-        meta,
-      }
-    );
+    await this.repository.update({ id }, updateData);
 
     const updated = await this.repository.findOne({
       where: { id },
-      relations: ['asset', 'selectedCurrency'],
+      relations: ['asset'],
     });
     return toObjectResponseMapper(updated, AccountResponseDto);
   }

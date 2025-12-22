@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpStatus, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, HttpStatus, HttpException, HttpCode } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { GetAuthenticatedAccountCase } from '../use-cases/get-authenticated-account.case';
 import { SearchAccountsCase } from '../use-cases/search-accounts.case';
@@ -45,6 +45,7 @@ export class AccountsController {
   }
 
   @Post('search')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Search accounts by keyword' })
   @ApiResponse({ status: 200, description: 'Accounts found', type: [AccountResponseDto] })
   async search(@Body() searchDto: SearchAccountDto): Promise<AccountResponseDto[]> {

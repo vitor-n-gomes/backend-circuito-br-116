@@ -1,94 +1,103 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, JoinColumn, Generated } from 'typeorm';
 import { Business } from './business.entity';
 import { Comment } from './comment.entity';
 import { LastSeenBusiness } from './last-seen-business.entity';
 import { SearchHistory } from './search-history.entity';
+import { Asset } from './asset.entity';
 
 @Entity('accounts')
 export class Account {
-  @PrimaryGeneratedColumn('increment', { name: 'aux_id' })
-  auxId: number;
-
-  @Column({ type: 'uuid', unique: true, default: () => 'gen_random_uuid()' })
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   name: string;
 
-  @Column({ name: 'auth_id', type: 'varchar', length: 100 })
-  authId: string;
-
-  @Column({ type: 'varchar', length: 100, unique: true, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   email: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  phone: string;
+  @Column({ type: 'varchar', length: 100 })
+  authId: string;
+
+  @Column({ type: 'boolean', default: false, nullable: true })
+  isAnonymous: boolean;
+
+  @Column({ type: 'json', nullable: true })
+  identities: Record<string, any>;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  deviceFCMToken: string;
 
   @Column({ type: 'text', nullable: true })
   picture: string;
 
-  @Column({ name: 'is_anonymous', type: 'boolean', default: false })
-  isAnonymous: boolean;
-
-  @Column({ name: 'accepted_terms_and_condition', type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false, nullable: true })
   acceptedTermsAndCondition: boolean;
 
-  @Column({ name: 'device_fcm_token', type: 'varchar', nullable: true })
-  deviceFCMToken: string;
-
-  @Column({ type: 'jsonb', default: {} })
-  identities: Record<string, string[]>;
-
-  @Column({ name: 'allowed_notifications', type: 'jsonb', default: {} })
-  allowedNotifications: Record<string, boolean>;
-
-  @Column({ type: 'jsonb', default: {} })
-  meta: Record<string, unknown>;
-
-  @Column({ name: 'asset_id', type: 'uuid', nullable: true })
-  assetId: string;
-
-  @Column({ type: 'integer', default: 0 })
-  coins: number;
-
-  @Column({ type: 'boolean', default: false })
-  verified: boolean;
-
-  @Column({ name: 'verified_at', type: 'timestamp', nullable: true })
-  verifiedAt: Date;
-
-  @Column({ name: 'verification_requested_at', type: 'timestamp', nullable: true })
-  verificationRequestedAt: Date;
-
-  @Column({ name: 'location_pretty', type: 'varchar', length: 200, nullable: true })
-  locationPretty: string;
-
-  @Column({ name: 'location_lat', type: 'double precision', nullable: true })
-  locationLat: number;
-
-  @Column({ name: 'location_long', type: 'double precision', nullable: true })
-  locationLong: number;
-
-  @Column({ name: 'preferred_categories_ids', type: 'uuid', array: true, default: [] })
-  preferredCategoriesIds: string[];
-
-  @Column({ name: 'categories_setup_done', type: 'boolean', default: false })
-  categoriesSetupDone: boolean;
-
-  @Column({ name: 'blocked_accounts', type: 'varchar', array: true, nullable: true, default: [] })
-  blockedAccounts: string[];
-
-  @Column({ name: 'intro_done', type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false, nullable: true })
   introDone: boolean;
 
-  @Column({ name: 'intro_skipped', type: 'boolean', default: false })
+  @Column({ type: 'boolean', default: false, nullable: true })
   introSkipped: boolean;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @Column({ type: 'uuid', nullable: true })
+  assetId: string;
+
+  @Column({ type: 'jsonb', default: {}, nullable: true })
+  meta: Record<string, any>;
+
+  @Column({ type: 'jsonb', nullable: true })
+  allowedNotifications: Record<string, any>;
+
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
+
+  @Column({ type: 'varchar', array: true, default: [], nullable: true })
+  blockedAccounts: string[];
+
+  @Column({ type: 'uuid', array: true, default: [], nullable: true })
+  preferredCategoriesIds: string[];
+
+  @Column({ type: 'boolean', default: false, nullable: true })
+  categoriesSetupDone: boolean;
+
+  @Column({ type: 'integer', default: 0, nullable: true })
+  coins: number;
+
+  @Column({ type: 'varchar', length: 200, nullable: true })
+  locationPretty: string;
+
+  @Column({ type: 'float8', nullable: true })
+  locationLat: number;
+
+  @Column({ type: 'json', nullable: true })
+  locationLong: any;
+
+  @Column({ type: 'boolean', default: false, nullable: true })
+  verified: boolean;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  verifiedAt: Date;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  verificationRequestedAt: Date;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  phone: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  selectedCurrencyId: string;
+
+  @Generated('increment')
+  @Column({ type: 'integer' })
+  aux_id: number;
+
+  @ManyToOne(() => Asset)
+  @JoinColumn({ name: 'assetId' })
+  asset: Asset;
 
   @OneToMany(() => Business, (business) => business.account)
   businesses: Business[];
@@ -102,3 +111,4 @@ export class Account {
   @OneToMany(() => SearchHistory, (searchHistory) => searchHistory.account)
   searchHistories: SearchHistory[];
 }
+

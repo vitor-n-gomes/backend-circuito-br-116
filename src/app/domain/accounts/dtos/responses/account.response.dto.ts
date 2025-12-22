@@ -61,8 +61,8 @@ export class AccountResponseDto {
   @ApiProperty({ description: 'Location latitude', example: -23.5505, required: false })
   locationLat?: number;
 
-  @ApiProperty({ description: 'Location longitude', example: -46.6333, required: false })
-  locationLong?: number;
+  @ApiProperty({ description: 'Location longitude (JSON)', example: -46.6333, required: false })
+  locationLong?: any;
 
   @ApiProperty({ description: 'Preferred category IDs', example: [], type: [String] })
   preferredCategoriesIds: string[];
