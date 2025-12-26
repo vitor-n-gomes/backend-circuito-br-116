@@ -1,5 +1,6 @@
 import { LocationResponseDto } from '../../../domain/location/dtos/responses/location.response.dto';
 import { CreateLocationDto } from '../../../domain/location/dtos/requests/create-location.request.dto';
+import { UpdateLocationDto } from '../../../domain/location/dtos/requests/update-location.request.dto';
 
 export abstract class ILocationRepository {
   abstract findAll(): Promise<LocationResponseDto[]>;
@@ -9,6 +10,8 @@ export abstract class ILocationRepository {
   abstract findByName(name: string): Promise<LocationResponseDto | null>;
   
   abstract create(data: CreateLocationDto): Promise<LocationResponseDto>;
+  
+  abstract update(id: string, data: UpdateLocationDto): Promise<LocationResponseDto>;
   
   abstract delete(id: string): Promise<void>;
 }
