@@ -71,3 +71,48 @@ export async function runFactories(factory: FactoryBuilder): Promise<any[]> {
 export function createDataSource(): DataSource {
   return new DataSource(createDataSourceConfig());
 }
+
+/**
+ * Generic cleanup function to delete test data by IDs
+ * @param entityClass - The entity class (e.g., Location, Business, etc.)
+ * @param ids - Array of aux_id values to delete
+ * @param idField - Field name to filter by (defaults to 'aux_id')
+ * 
+ * @example
+ * // Delete locations by aux_id
+ * await flushTestData(Location, [1, 2, 3]);
+ * 
+ * @example
+ * // Delete businesses by custom field
+ * await flushTestData(Business, [10, 20], 'id');
+ */
+export async function flushTestData<T>(
+  entityClass: new () => T,
+  ids: number[] | string[],
+  idField: string = 'aux_id'
+): Promise<void> {
+  if (!ids || ids.length === 0) {
+    return;
+  }
+
+  const dataSource = createDataSource();
+
+  try {
+    await dataSource.initialize();
+    const repository = dataSource.getRepository(entityClass);
+    
+    await repository
+      .createQueryBuilder()
+      .delete()
+      .where(`${idField} IN (:...ids)`, { ids })
+      .execute();
+
+  } catch (error) {
+    console.warn(`Warning: Failed to clean up test data:`, error);
+  } finally {
+    if (dataSource.isInitialized) {
+      await dataSource.destroy();
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+}
