@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryColumn, Generated, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, Generated, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Account } from './account.entity';
 
 @Entity('assets')
 export class Asset {

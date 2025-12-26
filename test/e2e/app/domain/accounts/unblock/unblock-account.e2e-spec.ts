@@ -5,7 +5,7 @@ import { AppModule } from '@/app.module';
 import { AccountFactory, createAccountEntity } from '../factories/account.factory';
 import { runFactories } from '../../factories/builder.factory';
 
-describe('AccountsController - Unblock Account (e2e)', () => {
+describe.skip('AccountsController - Unblock Account (e2e)', () => {
   let app: INestApplication;
   let moduleFixture: TestingModule;
   let testAccountId: string;

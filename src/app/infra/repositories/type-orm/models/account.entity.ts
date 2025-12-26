@@ -55,10 +55,10 @@ export class Account {
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
-  @Column({ type: 'varchar', array: true, default: [], nullable: true })
+  @Column({ type: 'varchar', length: 255, array: true, default: () => 'ARRAY[]::character varying(255)[]', nullable: true })
   blockedAccounts: string[];
 
-  @Column({ type: 'uuid', array: true, default: [], nullable: true })
+  @Column({ type: 'uuid', array: true, default: () => 'ARRAY[]::uuid[]', nullable: true })
   preferredCategoriesIds: string[];
 
   @Column({ type: 'boolean', default: false, nullable: true })
@@ -91,13 +91,8 @@ export class Account {
   @Column({ type: 'uuid', nullable: true })
   selectedCurrencyId: string;
 
-  @Generated('increment')
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer', generated: 'increment' })
   aux_id: number;
-
-  @ManyToOne(() => Asset)
-  @JoinColumn({ name: 'assetId' })
-  asset: Asset;
 
   @OneToMany(() => Business, (business) => business.account)
   businesses: Business[];
