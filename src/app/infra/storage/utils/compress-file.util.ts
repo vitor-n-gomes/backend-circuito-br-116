@@ -1,30 +1,17 @@
-import { Jimp, JimpMime } from 'jimp';
-
-
 /**
- * Compresses an image file buffer using Jimp
- * @param buffer - The file buffer to compress
+ * Placeholder for image compression (returns buffer as-is)
+ * TODO: Install sharp for production use: npm install sharp
+ * @param buffer - The file buffer
  * @param mimetype - The MIME type of the file
- * @returns Compressed buffer
+ * @returns Original buffer (compression disabled)
  */
 export async function compressFile(
   buffer: Buffer,
-  mimetype: any
+  mimetype: string
 ): Promise<Buffer> {
-  try {
-    const image = await Jimp.read(buffer);
-
-    if (image.width > 1920) {
-      image.resize({ w: 1920 });
-    }
-    
-    if (mimetype === JimpMime.jpeg) {
-      return await image.getBuffer(mimetype, { quality: 80 });
-    }
-    
-    return await image.getBuffer(mimetype);
-  } catch (error) {
-    console.error('Error compressing file:', error);
-    throw error;
-  }
+  // Compression is disabled - return buffer as-is
+  // To enable compression, install sharp: npm install sharp
+  // and implement compression logic here
+  console.warn('Image compression is disabled - using original file');
+  return buffer;
 }

@@ -6,7 +6,6 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
-import { JimpMime } from 'jimp';
 import { Response } from 'express';
 import { IStorageService } from '../interfaces/storage.interface.service';
 import { ExpressFile } from '../interfaces/storage.interface.service';
@@ -47,7 +46,9 @@ export class AWSStorageService implements IStorageService {
 
     try {
       file.filename = uuidv4();
-      file.mimetype = file.mimetype ?? JimpMime.jpeg;
+      file.mimetype = file.mimetype && file.mimetype.trim() !== '' 
+        ? file.mimetype 
+        : 'image/jpeg';
 
       let buffer = file.buffer;
       try {
