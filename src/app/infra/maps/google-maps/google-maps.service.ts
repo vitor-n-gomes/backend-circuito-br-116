@@ -7,24 +7,34 @@ import {
   DistanceMatrixResult,
   DirectionsResult,
 } from '../interfaces/maps.interface.service';
+import axios from 'axios';
+
 
 @Injectable()
 export class GoogleMapsService implements IMapsService {
   private apiKey: string;
   private baseUrl = 'https://maps.googleapis.com/maps/api';
+  private axiosInstance: any;
 
   constructor(private readonly configService: ConfigService) {
     this.apiKey = this.configService.get<string>('GOOGLE_MAPS_API_KEY') || '';
+    this.axiosInstance = axios.create({
+      timeout: 10000,
+    });
   }
 
   async geocode(address: string): Promise<GeocodeResult | null> {
     try {
-      const url = `${this.baseUrl}/geocode/json?address=${encodeURIComponent(address)}&key=${this.apiKey}`;
-      const response = await fetch(url);
-      const data = await response.json();
+      const url = `${this.baseUrl}/geocode/json`;
+      const response = await this.axiosInstance.get(url, {
+        params: {
+          address,
+          key: this.apiKey,
+        },
+      });
 
-      if (data.status === 'OK' && data.results.length > 0) {
-        const result = data.results[0];
+      if (response.data.status === 'OK' && response.data.results.length > 0) {
+        const result = response.data.results[0];
         return {
           address: address,
           latitude: result.geometry.location.lat,
@@ -46,12 +56,16 @@ export class GoogleMapsService implements IMapsService {
     longitude: number
   ): Promise<GeocodeResult | null> {
     try {
-      const url = `${this.baseUrl}/geocode/json?latlng=${latitude},${longitude}&key=${this.apiKey}`;
-      const response = await fetch(url);
-      const data = await response.json();
+      const url = `${this.baseUrl}/geocode/json`;
+      const response = await this.axiosInstance.get(url, {
+        params: {
+          latlng: `${latitude},${longitude}`,
+          key: this.apiKey,
+        },
+      });
 
-      if (data.status === 'OK' && data.results.length > 0) {
-        const result = data.results[0];
+      if (response.data.status === 'OK' && response.data.results.length > 0) {
+        const result = response.data.results[0];
         return {
           address: result.formatted_address,
           latitude: latitude,
@@ -75,17 +89,21 @@ export class GoogleMapsService implements IMapsService {
     radius: number = 5000
   ): Promise<PlaceDetails[]> {
     try {
-      let url = `${this.baseUrl}/place/textsearch/json?query=${encodeURIComponent(query)}&key=${this.apiKey}`;
+      const url = `${this.baseUrl}/place/textsearch/json`;
+      const params: any = {
+        query,
+        key: this.apiKey,
+      };
 
       if (latitude && longitude) {
-        url += `&location=${latitude},${longitude}&radius=${radius}`;
+        params.location = `${latitude},${longitude}`;
+        params.radius = radius;
       }
 
-      const response = await fetch(url);
-      const data = await response.json();
+      const response = await this.axiosInstance.get(url, { params });
 
-      if (data.status === 'OK' && data.results) {
-        return data.results.map((place: any) => ({
+      if (response.data.status === 'OK' && response.data.results) {
+        return response.data.results.map((place: any) => ({
           placeId: place.place_id,
           name: place.name,
           address: place.formatted_address,
@@ -105,12 +123,16 @@ export class GoogleMapsService implements IMapsService {
 
   async getPlaceDetails(placeId: string): Promise<PlaceDetails | null> {
     try {
-      const url = `${this.baseUrl}/place/details/json?place_id=${placeId}&key=${this.apiKey}`;
-      const response = await fetch(url);
-      const data = await response.json();
+      const url = `${this.baseUrl}/place/details/json`;
+      const response = await this.axiosInstance.get(url, {
+        params: {
+          place_id: placeId,
+          key: this.apiKey,
+        },
+      });
 
-      if (data.status === 'OK' && data.result) {
-        const place = data.result;
+      if (response.data.status === 'OK' && response.data.result) {
+        const place = response.data.result;
         return {
           placeId: place.place_id,
           name: place.name,
@@ -136,18 +158,18 @@ export class GoogleMapsService implements IMapsService {
     destinations: string[]
   ): Promise<DistanceMatrixResult[]> {
     try {
-      const originsParam = origins.map((o) => encodeURIComponent(o)).join('|');
-      const destinationsParam = destinations
-        .map((d) => encodeURIComponent(d))
-        .join('|');
+      const url = `${this.baseUrl}/distancematrix/json`;
+      const response = await this.axiosInstance.get(url, {
+        params: {
+          origins: origins.join('|'),
+          destinations: destinations.join('|'),
+          key: this.apiKey,
+        },
+      });
 
-      const url = `${this.baseUrl}/distancematrix/json?origins=${originsParam}&destinations=${destinationsParam}&key=${this.apiKey}`;
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (data.status === 'OK' && data.rows) {
+      if (response.data.status === 'OK' && response.data.rows) {
         const results: DistanceMatrixResult[] = [];
-        for (const row of data.rows) {
+        for (const row of response.data.rows) {
           for (const element of row.elements) {
             if (element.status === 'OK') {
               results.push({
@@ -173,12 +195,17 @@ export class GoogleMapsService implements IMapsService {
     destination: string
   ): Promise<DirectionsResult | null> {
     try {
-      const url = `${this.baseUrl}/directions/json?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&key=${this.apiKey}`;
-      const response = await fetch(url);
-      const data = await response.json();
+      const url = `${this.baseUrl}/directions/json`;
+      const response = await this.axiosInstance.get(url, {
+        params: {
+          origin,
+          destination,
+          key: this.apiKey,
+        },
+      });
 
-      if (data.status === 'OK' && data.routes.length > 0) {
-        const route = data.routes[0];
+      if (response.data.status === 'OK' && response.data.routes.length > 0) {
+        const route = response.data.routes[0];
         const leg = route.legs[0];
 
         return {
