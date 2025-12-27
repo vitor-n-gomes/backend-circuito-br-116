@@ -238,7 +238,7 @@ export class BusinessMigrationWorker implements IDataMigrationWorker {
     this.logger.debug(`⚠️  Category not found for palavrachave: "${palavrachave}"`);
     return undefined;
   }
-}
+
 
   async run(): Promise<DataMigrationResult> {
     const startTime = Date.now();
