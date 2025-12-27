@@ -30,11 +30,11 @@ export class BusinessMigrationMapper {
 
     return {
       title: this.sanitizeString(legacy.empresa) || 'Empresa Importada',
-      description: description,
+      description: "",
       locationLat: coords.latitude,
       locationLong: coords.longitude,
       locationId: defaults.locationId || 1,
-      categoryId: this.mapPalavrachaveToCategory(legacy.palavrachave) || defaults.categoryId || 1,
+      categoryId: defaults.categoryId || 1,
       accountId: defaults.accountId || 1,
       phoneNumber: phoneNumber,
       email: this.sanitizeEmail(legacy.email),
@@ -47,6 +47,17 @@ export class BusinessMigrationMapper {
       isVerified: legacy.nivel !== 'f' && legacy.pago === 's',
       classification: classification,
       promotedAt: this.determinePromotedAt(legacy),
+      oldFields: {
+        originalDescription: this.sanitizeString(legacy.informacoes),
+        originalPhoto: this.sanitizeString(legacy.foto),
+        originalKeywords: this.sanitizeString(legacy.palavrachave),
+        originalWords: this.sanitizeString(legacy.palavras),
+        originalObservations: this.sanitizeString(legacy.obsinternas),
+        originalLevel: legacy.nivel,
+        originalPaid: legacy.pago,
+        originalClub: legacy.clube,
+        originalCode: legacy.codcadastro,
+      },
       createdAt: legacy.datacadastro || legacy.dataatualizada || new Date(),
       updatedAt: legacy.dataatualizada || legacy.datacadastro || new Date(),
     };
@@ -182,78 +193,6 @@ export class BusinessMigrationMapper {
    * Format: "materiais_para_construções" (underscores instead of spaces)
    * This is a simple implementation - you may want to create a lookup table
    */
-  private mapPalavrachaveToCategory(palavrachave: string | null | undefined): number | undefined {
-    if (!palavrachave) {
-      return undefined;
-    }
-
-    // Normalize: replace underscores with spaces, lowercase, trim
-    const keyword = palavrachave.toLowerCase().trim().replace(/_/g, ' ');
-
-    // Extended keyword mapping - add more as you identify categories
-    const categoryMap: { [key: string]: number } = {
-      // Food & Dining
-      'restaurante': 1,
-      'lanchonete': 1,
-      'pizzaria': 1,
-      'churrascaria': 1,
-      'bar': 1,
-      'cafeteria': 1,
-      'padaria': 1,
-      
-      // Accommodation
-      'hotel': 2,
-      'pousada': 2,
-      'motel': 2,
-      'hostel': 2,
-      'camping': 3,
-      
-      // Fuel & Auto
-      'posto': 4,
-      'combustivel': 4,
-      'gasolina': 4,
-      'mecanica': 6,
-      'oficina': 6,
-      'auto pecas': 6,
-      'borracharia': 6,
-      
-      // Shopping
-      'mercado': 5,
-      'supermercado': 5,
-      'minimercado': 5,
-      'loja': 5,
-      'comercio': 5,
-      
-      // Construction
-      'materiais para construcoes': 7,
-      'construcao': 7,
-      'ferragem': 7,
-      'madeireira': 7,
-      
-      // Services
-      'farmacia': 8,
-      'drogaria': 8,
-      'clinica': 9,
-      'hospital': 9,
-      'medico': 9,
-      'dentista': 9,
-      
-      // Add more mappings as needed
-    };
-
-    // Check for exact match or partial match
-    for (const [key, categoryId] of Object.entries(categoryMap)) {
-      if (keyword === key || keyword.includes(key)) {
-        return categoryId;
-      }
-    }
-
-    // Log unmapped keywords for future reference
-    this.logger.debug(`Unmapped keyword: "${palavrachave}" (normalized: "${keyword}")`);
-
-    return undefined;
-  }
-
   /**
    * Extract Instagram handle from site URL if it contains instagram.com
    */

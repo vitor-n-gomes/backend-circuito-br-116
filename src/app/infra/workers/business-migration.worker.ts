@@ -19,9 +19,9 @@ export class BusinessMigrationWorker implements IDataMigrationWorker {
   private readonly logger = new Logger(BusinessMigrationWorker.name);
   private readonly BATCH_SIZE = 100;
   private readonly DEFAULT_ACCOUNT_ID = 1;
-  private readonly DEFAULT_LOCATION_ID = 1;
-  private readonly DEFAULT_CATEGORY_ID = 1;
-  private readonly DEFAULT_CLASSIFICATION = 'A1';
+  private readonly DEFAULT_LOCATION_ID = 192;
+  private readonly DEFAULT_CATEGORY_ID = 1811;
+  private readonly DEFAULT_CLASSIFICATION = 'F';
   private readonly isDryRun = process.env.DRY_RUN === 'true';
 
   // Cache for category lookups
@@ -121,13 +121,13 @@ export class BusinessMigrationWorker implements IDataMigrationWorker {
             }
 
             // Resolve category ID from palavrachave
-            const categoryId = await this.resolveCategoryId(legacy.palavrachave);
+            const categoryId = this.DEFAULT_CATEGORY_ID;
 
             // Map legacy data to new entity
             const mappedData = this.mapper.mapToEntity(legacy, {
               accountId: this.DEFAULT_ACCOUNT_ID,
               locationId: this.DEFAULT_LOCATION_ID,
-              categoryId: categoryId || this.DEFAULT_CATEGORY_ID,
+              categoryId: this.DEFAULT_CATEGORY_ID,
             });
 
             // Create business entity

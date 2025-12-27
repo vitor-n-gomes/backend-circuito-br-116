@@ -19,6 +19,15 @@ export class Asset {
   @Column({ name: 'initialName', type: 'varchar', nullable: true })
   initialName: string;
 
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  mimetype: string;
+
+  @Column({ name: 'storageKey', type: 'varchar', length: 500, nullable: true })
+  storageKey: string;
+
+  @Column({ name: 'storageUrl', type: 'varchar', length: 500, nullable: true })
+  storageUrl: string;
+
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 

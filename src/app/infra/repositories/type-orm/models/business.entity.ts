@@ -70,6 +70,9 @@ export class Business {
   @Column({ type: 'jsonb', nullable: true })
   vectors: Record<string, number[]>;
 
+  @Column({ type: 'jsonb', nullable: true })
+  oldFields: Record<string, any>;
+
   @CreateDateColumn({ name: 'createdAt' })
   createdAt: Date;
 

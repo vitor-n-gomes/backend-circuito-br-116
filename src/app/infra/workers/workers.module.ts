@@ -18,6 +18,7 @@ import { BusinessMigrationWorker } from './business-migration.worker';
 import { CategoryMigrationWorker } from './category-migration.worker';
 import { CategoryExtractionWorker } from './category-extraction.worker';
 import { LocationExtractionWorker } from './location-extraction.worker';
+import { PhotoMigrationWorker } from './photo-migration.worker';
 
 // Mappers
 import { BusinessMigrationMapper } from './mappers/business-migration.mapper';
@@ -55,12 +56,14 @@ import { LocationMigrationMapper } from './mappers/location-migration.mapper';
     LocationExtractionWorker,
     BusinessMigrationWorker,
     CategoryMigrationWorker,
+    PhotoMigrationWorker,
   ],
   exports: [
     CategoryExtractionWorker,
     LocationExtractionWorker,
     BusinessMigrationWorker,
     CategoryMigrationWorker,
+    PhotoMigrationWorker,
   ],
 })
 export class WorkersModule {}

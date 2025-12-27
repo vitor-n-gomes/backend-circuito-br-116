@@ -3,6 +3,7 @@ import { FilterBusinessDto } from '../../../domain/business/dtos/requests/filter
 import { BusinessResponseDto } from '../../../domain/business/dtos/responses/business.response.dto';
 import { CreateBusinessDto } from '../../../domain/business/dtos/requests/create-business.request.dto';
 import { UpdateBusinessDto } from '../../../domain/business/dtos/requests/update-business.request.dto';
+import { Business } from '../type-orm/models/business.entity';
 
 export abstract class IBusinessRepository {
   abstract findById(id: number): Promise<BusinessResponseDto | null>;
@@ -55,4 +56,6 @@ export abstract class IBusinessRepository {
   abstract promote(id: number): Promise<void>;
   
   abstract countByAccountId(accountId: number): Promise<number>;
+  
+  abstract findBusinessesWithValidPhoto(): Promise<Business[]>;
 }

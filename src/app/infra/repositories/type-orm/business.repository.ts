@@ -264,4 +264,19 @@ export class BusinessRepository implements IBusinessRepository {
   async countByAccountId(accountId: number): Promise<number> {
     return await this.businessRepo.count({ where: { accountId } });
   }
+
+  async findBusinessesWithValidPhoto(): Promise<Business[]> {
+    const businesses = await this.businessRepo
+      .createQueryBuilder('business')
+      .where("business.oldFields ? 'originalPhoto'")
+      .andWhere("business.oldFields->>'originalPhoto' IS NOT NULL")
+      .andWhere("business.oldFields->>'originalPhoto' != ''")
+      .andWhere("TRIM(business.oldFields->>'originalPhoto') != ''")
+      .andWhere("business.oldFields->>'originalPhoto' NOT ILIKE '%null%'")
+      .andWhere("business.oldFields->>'originalPhoto' NOT ILIKE '%undefined%'")
+      .andWhere("business.oldFields->>'originalPhoto' NOT ILIKE '%n/a%'")
+      .getMany();
+
+    return businesses.map(business => toObjectResponseMapper(business, Business));
+  }
 }
