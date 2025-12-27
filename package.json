@@ -23,7 +23,13 @@
       "typeorm": "ts-node ./node_modules/typeorm/cli.js",
       "migration:generate": "typeorm migration:generate -d ./src/migration",
       "migration:run": "typeorm migration:run",
-      "migration:revert": "typeorm migration:revert"
+      "migration:revert": "typeorm migration:revert",
+      "migrate:data": "ts-node -r tsconfig-paths/register src/app/infra/workers/cli/migrate-data.command.ts",
+      "migrate:data:extract-categories": "ts-node -r tsconfig-paths/register src/app/infra/workers/cli/migrate-data.command.ts extract-categories",
+      "migrate:data:extract-locations": "ts-node -r tsconfig-paths/register src/app/infra/workers/cli/migrate-data.command.ts extract-locations",
+      "migrate:data:business": "ts-node -r tsconfig-paths/register src/app/infra/workers/cli/migrate-data.command.ts business",
+      "migrate:data:category": "ts-node -r tsconfig-paths/register src/app/infra/workers/cli/migrate-data.command.ts category",
+      "migrate:data:dry-run": "DRY_RUN=true npm run migrate:data"
    },
    "dependencies": {
       "@aws-sdk/client-s3": "^3.958.0",
@@ -39,6 +45,7 @@
       "class-validator": "^0.14.1",
       "clear": "^0.1.0",
       "install": "^0.13.0",
+      "mysql2": "^3.16.0",
       "npm": "^11.6.1",
       "pg": "^8.16.3",
       "reflect-metadata": "^0.1.13",
