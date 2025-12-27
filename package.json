@@ -29,7 +29,8 @@
       "migrate:data:extract-locations": "ts-node -r tsconfig-paths/register src/app/infra/workers/cli/migrate-data.command.ts extract-locations",
       "migrate:data:business": "ts-node -r tsconfig-paths/register src/app/infra/workers/cli/migrate-data.command.ts business",
       "migrate:data:category": "ts-node -r tsconfig-paths/register src/app/infra/workers/cli/migrate-data.command.ts category",
-      "migrate:data:dry-run": "DRY_RUN=true npm run migrate:data"
+      "migrate:data:dry-run": "DRY_RUN=true npm run migrate:data",
+      "migrate:data:location:dry-run": "DRY_RUN=true npm run migrate:data:extract-locations"
    },
    "dependencies": {
       "@aws-sdk/client-s3": "^3.958.0",

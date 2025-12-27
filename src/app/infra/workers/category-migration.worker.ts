@@ -4,10 +4,10 @@ import { Repository } from 'typeorm';
 import {
   IDataMigrationWorker,
   DataMigrationResult,
-} from '../interfaces/data-migration.interface.worker';
-import { LegacyCategory } from '../legacy-models/legacy-category.entity';
-import { Category } from '../../repositories/type-orm/models/category.entity';
-import { CategoryMigrationMapper } from '../mappers/category-migration.mapper';
+} from './interfaces/data-migration.interface.worker';
+import { LegacyCategory } from './legacy-models/legacy-category.entity';
+import { Category } from '../repositories/type-orm/models/category.entity';
+import { CategoryMigrationMapper } from './mappers/category-migration.mapper';
 
 /**
  * Worker to migrate category data from MySQL to PostgreSQL
@@ -83,9 +83,10 @@ export class CategoryMigrationWorker implements IDataMigrationWorker {
               continue;
             }
 
-            const existing = await this.categoryRepo.findOne({
-              where: { name: legacy.name },
-            });
+            const existing = await this.categoryRepo
+              .createQueryBuilder('category')
+              .where("category.name->>'pt' = :name", { name: legacy.name })
+              .getOne();
 
             if (existing) {
               this.logger.debug(`⏭️  Skipping existing: ${legacy.name}`);

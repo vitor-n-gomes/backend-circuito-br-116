@@ -1,11 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
   IDataMigrationWorker,
   DataMigrationResult,
-} from '../interfaces/data-migration.interface.worker';
-import { LegacyBusiness } from '../legacy-models/legacy-business.entity';
+} from './interfaces/data-migration.interface.worker';
+import { LegacyBusiness } from './legacy-models/legacy-business.entity';
+import { ILocationRepository } from '../repositories/interfaces/location.interface.repository';
 
 /**
  * Worker to extract unique locations from cadastro (cidade + estado)
@@ -22,9 +23,8 @@ export class LocationExtractionWorker implements IDataMigrationWorker {
   constructor(
     @InjectRepository(LegacyBusiness, 'mysql_legacy')
     private readonly legacyRepo: Repository<LegacyBusiness>,
-    // TODO: Inject your Location repository here when you create the entity
-    // @InjectRepository(Location)
-    // private readonly locationRepo: Repository<Location>,
+    @Inject(ILocationRepository)
+    private readonly locationRepo: ILocationRepository,
   ) {}
 
   getName(): string {
@@ -90,31 +90,17 @@ export class LocationExtractionWorker implements IDataMigrationWorker {
             continue;
           }
 
-          // TODO: Implement location creation when you have the Location entity
-          // For now, just log what would be created
-          
           const locationName = this.buildLocationName(cidade, estado);
           
           this.logger.debug(
-            `${this.isDryRun ? '[DRY RUN] ' : '[TODO] '}Would create location: ${locationName}`
+            `${this.isDryRun ? '[DRY RUN] ' : ''}Creating location: ${locationName}`
           );
 
-          // Placeholder - replace with actual repository save when Location entity exists
-          /*
-          const location = this.locationRepo.create({
-            name: cidade.trim(),
-            city: cidade.trim(),
-            state: estado?.trim().toUpperCase(),
-            latitude: null, // Can be populated later or from average of businesses
-            longitude: null,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          });
-
           if (!this.isDryRun) {
-            await this.locationRepo.save(location);
+            await this.locationRepo.create({
+              name: locationName,
+            });
           }
-          */
 
           result.imported++;
           processedLocations.add(locationKey);
@@ -130,12 +116,7 @@ export class LocationExtractionWorker implements IDataMigrationWorker {
 
       this.logger.log(
         `✅ Location extraction completed in ${(result.durationMs / 1000).toFixed(2)}s: ` +
-        `${result.imported} would be imported, ${result.skipped} skipped, ${result.failed} failed`,
-      );
-
-      this.logger.warn(
-        '⚠️  Note: Location entity not implemented yet. ' +
-        'Create a Location entity and update this worker to save locations.'
+        `${result.imported} ${this.isDryRun ? 'would be ' : ''}imported, ${result.skipped} skipped, ${result.failed} failed`,
       );
     } catch (error) {
       this.logger.error(

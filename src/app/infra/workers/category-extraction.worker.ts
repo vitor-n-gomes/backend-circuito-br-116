@@ -4,9 +4,9 @@ import { Repository } from 'typeorm';
 import {
   IDataMigrationWorker,
   DataMigrationResult,
-} from '../interfaces/data-migration.interface.worker';
-import { LegacyBusiness } from '../legacy-models/legacy-business.entity';
-import { Category } from '../../repositories/type-orm/models/category.entity';
+} from './interfaces/data-migration.interface.worker';
+import { LegacyBusiness } from './legacy-models/legacy-business.entity';
+import { Category } from '../repositories/type-orm/models/category.entity';
 
 /**
  * Worker to extract unique categories from cadastro.palavrachave
