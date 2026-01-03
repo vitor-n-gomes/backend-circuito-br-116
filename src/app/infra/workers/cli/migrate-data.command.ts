@@ -5,6 +5,7 @@ import { BusinessMigrationWorker } from '../business-migration.worker';
 import { CategoryMigrationWorker } from '../category-migration.worker';
 import { CategoryExtractionWorker } from '../category-extraction.worker';
 import { LocationExtractionWorker } from '../location-extraction.worker';
+import { PhotoMigrationWorker } from '../photo-migration.worker';
 import { IDataMigrationWorker } from '../interfaces/data-migration.interface.worker';
 
 /**
@@ -13,6 +14,7 @@ import { IDataMigrationWorker } from '../interfaces/data-migration.interface.wor
  *   npm run migrate:data                 # Run all migrations
  *   npm run migrate:data business        # Run only business migration
  *   npm run migrate:data category        # Run only category migration
+ *   npm run migrate:data photos          # Run only photo migration
  *   DRY_RUN=true npm run migrate:data    # Dry run mode (no writes)
  */
 async function bootstrap() {
@@ -40,6 +42,7 @@ async function bootstrap() {
       'extract-locations': app.get(LocationExtractionWorker),
       category: app.get(CategoryMigrationWorker),
       business: app.get(BusinessMigrationWorker),
+      photos: app.get(PhotoMigrationWorker),
     };
 
     // Determine which workers to run

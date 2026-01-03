@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { MySQLConnectionModule } from './mysql-connection.module';
 import { TypeOrmRepositoryModule } from '../repositories/type-orm/typeorm.repository.module';
+import { StorageModule } from '../storage/storage.module';
 
 // Legacy MySQL entities
 import { LegacyBusiness } from './legacy-models/legacy-business.entity';
@@ -37,6 +38,7 @@ import { LocationMigrationMapper } from './mappers/location-migration.mapper';
     }),
     MySQLConnectionModule,
     TypeOrmRepositoryModule,
+    StorageModule,
     // PostgreSQL entities
     TypeOrmModule.forFeature([Business, Category]),
     // MySQL legacy entities (named connection)

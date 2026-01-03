@@ -65,9 +65,12 @@ export class BusinessMigrationWorker implements IDataMigrationWorker {
       // Preload category cache
       await this.loadCategoryCache();
 
-      // Get total count from MySQL
-      const total = await this.legacyRepo.count();
-      this.logger.log(`📊 Found ${total} businesses to migrate`);
+      // Get total count from MySQL with filter for levels A, B, C and foto not null/empty
+      const total = await this.legacyRepo
+        .createQueryBuilder('c')
+        .andWhere('c.nivel IN (:...levels)', { levels: ['A', 'B', 'C', 'a', 'b', 'c'] })
+        .getCount();
+      this.logger.log(`📊 Found ${total} businesses (levels A/B/C with photos) to migrate`);
 
       if (total === 0) {
         this.logger.warn('⚠️  No businesses found in legacy database');
@@ -83,11 +86,13 @@ export class BusinessMigrationWorker implements IDataMigrationWorker {
 
       for (let i = 0; i < batches; i++) {
         const offset = i * this.BATCH_SIZE;
-        const legacyBusinesses = await this.legacyRepo.find({
-          skip: offset,
-          take: this.BATCH_SIZE,
-          order: { codcadastro: 'ASC' },
-        });
+        const legacyBusinesses = await this.legacyRepo
+          .createQueryBuilder('c')
+          .andWhere('c.nivel IN (:...levels)', { levels: ['A', 'B', 'C', 'a', 'b', 'c'] })
+          .orderBy('c.codcadastro', 'ASC')
+          .skip(offset)
+          .take(this.BATCH_SIZE)
+          .getMany();
 
         this.logger.log(
           `📦 Processing batch ${i + 1}/${batches} (${legacyBusinesses.length} items)`,

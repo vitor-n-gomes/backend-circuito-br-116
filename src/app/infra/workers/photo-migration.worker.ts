@@ -1,8 +1,7 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { IBusinessRepository } from '../repositories/interfaces/business.interface.repository';
 import { IAssetRepository } from '../repositories/interfaces/asset.interface.repository';
-import { AWSStorageService } from '../storage/aws/aws-storage.service';
-import { ExpressFile } from '../storage/interfaces/storage.interface.service';
+import { IStorageService, ExpressFile } from '../storage/interfaces/storage.interface.service';
 import {
   IDataMigrationWorker,
   DataMigrationResult,
@@ -25,7 +24,8 @@ export class PhotoMigrationWorker implements IDataMigrationWorker {
     private readonly businessRepository: IBusinessRepository,
     @Inject(IAssetRepository)
     private readonly assetRepository: IAssetRepository,
-    private readonly storageService: AWSStorageService,
+    @Inject(IStorageService)
+    private readonly storageService: IStorageService,
   ) {}
 
   getName(): string {
