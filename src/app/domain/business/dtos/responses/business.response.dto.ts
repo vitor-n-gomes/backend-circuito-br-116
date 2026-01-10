@@ -1,8 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class BusinessResponseDto {
-  @ApiProperty({ description: 'Business ID', example: 1 })
-  auxId: number;
 
   @ApiProperty({ description: 'Business UUID', example: '123e4567-e89b-12d3-a456-426614174000' })
   id: string;
@@ -21,6 +19,9 @@ export class BusinessResponseDto {
 
   @ApiProperty({ description: 'Longitude coordinate', example: -46.6333 })
   locationLong: number;
+
+  @ApiProperty({ description: 'Business Logo URL', example: 'https://example.com/image.jpg' })
+  urlImage: string;
 
   @ApiProperty({ description: 'Business title', example: 'Amazing Restaurant' })
   title: string;

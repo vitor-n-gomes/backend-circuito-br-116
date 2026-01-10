@@ -1,6 +1,31 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/businesses/latest": {
+      "get": {
+        "operationId": "BusinessController_getLatest",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BusinessResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get latest businesses",
+        "tags": [
+          "Business"
+        ]
+      }
+    },
     "/businesses": {
       "post": {
         "operationId": "BusinessController_create",
@@ -102,71 +127,6 @@
           }
         },
         "summary": "Delete a business",
-        "tags": [
-          "Business"
-        ]
-      },
-      "get": {
-        "operationId": "BusinessController_getById",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "example": 1,
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BusinessResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get business by ID",
-        "tags": [
-          "Business"
-        ]
-      }
-    },
-    "/businesses/latest": {
-      "get": {
-        "operationId": "BusinessController_getLatest",
-        "parameters": [
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "example": 12,
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/BusinessResponseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get latest businesses",
         "tags": [
           "Business"
         ]
@@ -406,7 +366,39 @@
         ]
       }
     },
-    "/businesses/{id}/increment-views": {
+    "/businesses/details/{id}": {
+      "get": {
+        "operationId": "BusinessController_getById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get business by ID",
+        "tags": [
+          "Business"
+        ]
+      }
+    },
+    "/businesses/details/{id}/increment-views": {
       "post": {
         "operationId": "BusinessController_incrementViews",
         "parameters": [
@@ -454,6 +446,36 @@
         "tags": [
           "Categories"
         ]
+      },
+      "post": {
+        "operationId": "CategoriesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a new category",
+        "tags": [
+          "Categories"
+        ]
       }
     },
     "/categories/business": {
@@ -476,6 +498,71 @@
           }
         },
         "summary": "Get all categories with business count",
+        "tags": [
+          "Categories"
+        ]
+      }
+    },
+    "/categories/{id}": {
+      "put": {
+        "operationId": "CategoriesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Category UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update a category",
+        "tags": [
+          "Categories"
+        ]
+      },
+      "delete": {
+        "operationId": "CategoriesController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Category UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Delete a category",
         "tags": [
           "Categories"
         ]
@@ -690,6 +777,101 @@
           }
         },
         "summary": "Get all locations",
+        "tags": [
+          "Locations"
+        ]
+      },
+      "post": {
+        "operationId": "LocationController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLocationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a new location",
+        "tags": [
+          "Locations"
+        ]
+      }
+    },
+    "/locations/{id}": {
+      "put": {
+        "operationId": "LocationController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Location UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLocationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update a location",
+        "tags": [
+          "Locations"
+        ]
+      },
+      "delete": {
+        "operationId": "LocationController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Location UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Delete a location",
         "tags": [
           "Locations"
         ]
@@ -1099,93 +1281,9 @@
   ],
   "components": {
     "schemas": {
-      "CreateBusinessDto": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "description": "Business title",
-            "example": "Amazing Restaurant"
-          },
-          "description": {
-            "type": "string",
-            "description": "Business description",
-            "example": "The best food in town"
-          },
-          "locationPretty": {
-            "type": "string",
-            "description": "Location name",
-            "example": "São Paulo, SP"
-          },
-          "locationLat": {
-            "type": "number",
-            "description": "Latitude coordinate",
-            "example": -23.5505
-          },
-          "locationLong": {
-            "type": "number",
-            "description": "Longitude coordinate",
-            "example": -46.6333
-          },
-          "category_id": {
-            "type": "number",
-            "description": "Category ID",
-            "example": 1
-          },
-          "classification": {
-            "type": "string",
-            "description": "Classification code",
-            "example": "A1"
-          },
-          "phoneNumber": {
-            "type": "string",
-            "description": "Phone number",
-            "example": "+5511999999999"
-          },
-          "email": {
-            "type": "string",
-            "description": "Email address",
-            "example": "contact@business.com"
-          },
-          "address": {
-            "type": "string",
-            "description": "Physical address",
-            "example": "Rua Example, 123"
-          },
-          "whatsapp": {
-            "type": "string",
-            "description": "WhatsApp number",
-            "example": "+5511999999999"
-          },
-          "facebook": {
-            "type": "string",
-            "description": "Facebook profile URL"
-          },
-          "instagram": {
-            "type": "string",
-            "description": "Instagram handle"
-          },
-          "tiktok": {
-            "type": "string",
-            "description": "TikTok handle"
-          }
-        },
-        "required": [
-          "title",
-          "locationPretty",
-          "locationLat",
-          "locationLong",
-          "category_id"
-        ]
-      },
       "BusinessResponseDto": {
         "type": "object",
         "properties": {
-          "aux_id": {
-            "type": "number",
-            "description": "Business ID",
-            "example": 1
-          },
           "id": {
             "type": "string",
             "description": "Business UUID",
@@ -1215,6 +1313,11 @@
             "type": "number",
             "description": "Longitude coordinate",
             "example": -46.6333
+          },
+          "urlImage": {
+            "type": "string",
+            "description": "Business Logo URL",
+            "example": "https://example.com/image.jpg"
           },
           "title": {
             "type": "string",
@@ -1273,7 +1376,7 @@
             "type": "string",
             "description": "TikTok handle"
           },
-          "category_id": {
+          "categoryId": {
             "type": "number",
             "description": "Category ID",
             "example": 1
@@ -1295,21 +1398,105 @@
           }
         },
         "required": [
-          "aux_id",
           "id",
           "accountId",
           "locationId",
           "locationPretty",
           "locationLat",
           "locationLong",
+          "urlImage",
           "title",
           "description",
           "views",
           "isVerified",
-          "category_id",
+          "categoryId",
           "classification",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "CreateBusinessDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Business title",
+            "example": "Amazing Restaurant"
+          },
+          "description": {
+            "type": "string",
+            "description": "Business description",
+            "example": "The best food in town"
+          },
+          "locationPretty": {
+            "type": "string",
+            "description": "Location name",
+            "example": "São Paulo, SP"
+          },
+          "locationId": {
+            "type": "number",
+            "description": "Location ID",
+            "example": 1
+          },
+          "locationLat": {
+            "type": "number",
+            "description": "Latitude coordinate",
+            "example": -23.5505
+          },
+          "locationLong": {
+            "type": "number",
+            "description": "Longitude coordinate",
+            "example": -46.6333
+          },
+          "categoryId": {
+            "type": "number",
+            "description": "Category ID",
+            "example": 1
+          },
+          "classification": {
+            "type": "string",
+            "description": "Classification code",
+            "example": "A1"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Phone number",
+            "example": "+5511999999999"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address",
+            "example": "contact@business.com"
+          },
+          "address": {
+            "type": "string",
+            "description": "Physical address",
+            "example": "Rua Example, 123"
+          },
+          "whatsapp": {
+            "type": "string",
+            "description": "WhatsApp number",
+            "example": "+5511999999999"
+          },
+          "facebook": {
+            "type": "string",
+            "description": "Facebook profile URL"
+          },
+          "instagram": {
+            "type": "string",
+            "description": "Instagram handle"
+          },
+          "tiktok": {
+            "type": "string",
+            "description": "TikTok handle"
+          }
+        },
+        "required": [
+          "title",
+          "locationPretty",
+          "locationLat",
+          "locationLong",
+          "categoryId"
         ]
       },
       "UpdateBusinessDto": {
@@ -1340,7 +1527,7 @@
             "description": "Longitude coordinate",
             "example": -46.6333
           },
-          "category_id": {
+          "categoryId": {
             "type": "number",
             "description": "Category ID",
             "example": 1
@@ -1564,6 +1751,75 @@
           "updatedAt"
         ]
       },
+      "CreateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "object",
+            "description": "Category name in multiple languages",
+            "example": {
+              "en": "Electronics",
+              "pt": "Eletrônicos"
+            }
+          },
+          "parentCategoryId": {
+            "type": "string",
+            "description": "Parent category UUID"
+          },
+          "details": {
+            "type": "object",
+            "description": "Category details"
+          },
+          "icon": {
+            "type": "string",
+            "description": "Icon name/path"
+          },
+          "assetId": {
+            "type": "string",
+            "description": "Asset ID for category image"
+          },
+          "remoteIconUrl": {
+            "type": "string",
+            "description": "Remote icon URL"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "object",
+            "description": "Category name in multiple languages",
+            "example": {
+              "en": "Electronics",
+              "pt": "Eletrônicos"
+            }
+          },
+          "parentCategoryId": {
+            "type": "string",
+            "description": "Parent category UUID"
+          },
+          "details": {
+            "type": "object",
+            "description": "Category details"
+          },
+          "icon": {
+            "type": "string",
+            "description": "Icon name/path"
+          },
+          "assetId": {
+            "type": "string",
+            "description": "Asset ID for category image"
+          },
+          "remoteIconUrl": {
+            "type": "string",
+            "description": "Remote icon URL"
+          }
+        }
+      },
       "CreateCommentDto": {
         "type": "object",
         "properties": {
@@ -1665,6 +1921,21 @@
           "initialName": {
             "type": "string",
             "description": "Original filename"
+          },
+          "mimetype": {
+            "type": "string",
+            "description": "MIME type of the file",
+            "example": "image/jpeg"
+          },
+          "storageKey": {
+            "type": "string",
+            "description": "Storage key/path",
+            "example": "business-logos/uuid-filename.jpg"
+          },
+          "storageUrl": {
+            "type": "string",
+            "description": "Storage URL",
+            "example": "https://s3.amazonaws.com/bucket/path/file.jpg"
           }
         },
         "required": [
@@ -1759,6 +2030,29 @@
           "createdAt",
           "updatedAt"
         ]
+      },
+      "CreateLocationDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Location name",
+            "example": "São Paulo, SP"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateLocationDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Location name",
+            "example": "São Paulo, SP"
+          }
+        }
       },
       "SearchHistoryResponseDto": {
         "type": "object",
@@ -2004,8 +2298,8 @@
             "example": -23.5505
           },
           "locationLong": {
-            "type": "number",
-            "description": "Location longitude",
+            "type": "object",
+            "description": "Location longitude (JSON)",
             "example": -46.6333
           },
           "preferredCategoriesIds": {
@@ -2106,11 +2400,6 @@
             "description": "Account name",
             "example": "John Doe"
           },
-          "locationLatLng": {
-            "type": "string",
-            "description": "Location coordinates [lat, lng]",
-            "example": "[-23.5505, -46.6333]"
-          },
           "locationPretty": {
             "type": "string",
             "description": "Location description",
@@ -2175,8 +2464,8 @@
             "example": -23.5505
           },
           "locationLong": {
-            "type": "number",
-            "description": "Location longitude",
+            "type": "object",
+            "description": "Location longitude (JSON)",
             "example": -46.6333
           }
         }

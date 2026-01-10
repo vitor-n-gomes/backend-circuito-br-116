@@ -10,6 +10,7 @@ import { toObjectResponseMapper } from './mappers/to-object-response.mapper';
 import { BusinessResponseDto } from '@/app/domain/business/dtos/responses/business.response.dto';
 import { CreateBusinessDto } from '@/app/domain/business/dtos/requests/create-business.request.dto';
 import { UpdateBusinessDto } from '@/app/domain/business/dtos/requests/update-business.request.dto';
+import { BusinessWithAssetResponseDto } from '@/app/domain/business/dtos/responses/business-with-asset.response.dto';
 
 @Injectable()
 export class BusinessRepository implements IBusinessRepository {
@@ -158,34 +159,63 @@ export class BusinessRepository implements IBusinessRepository {
     return toPaginationResponseMapper(data, total, page, limit, BusinessResponseDto);
   }
 
-  async getLatest(limit: number = 12): Promise<BusinessResponseDto[]> {
-    // Check if there are enough promoted businesses
-    const promotedCount = await this.businessRepo.count({
-      where: { promotedAt: Not(IsNull()) },
+  async getLatest(limit: number = 12): Promise<BusinessWithAssetResponseDto[]> {
+
+    let queryBuilder = this.businessRepo
+      .createQueryBuilder('b')
+      .innerJoin('businesses_assets', 'ba', 'ba."businessId" = b.aux_id AND ba."isPrimary" = true')
+      .innerJoin('assets', 'a', 'a.aux_id = ba."assetId"')
+      .select([
+        'b.id',
+        'b.title', 
+        'b.description',
+        'b.category_id',
+        'b."locationId"',
+        'b."locationPretty"',
+        'b."locationLat"',
+        'b."locationLong"',
+        'b.classification',
+        'b."phoneNumber"',
+        'b.email',
+        'b.address',
+        'b.views',
+        'b."isVerified"',
+        'b."promotedAt"',
+        'b."accountId"',
+        'b."createdAt"',
+        'b."updatedAt"',
+        'b.whatsapp',
+        'b.facebook',
+        'b.instagram',
+        'b.tiktok',
+        'b."oldFields"'
+      ])
+      .addSelect([
+        'a."storageUrl" as primary_asset_url',
+        'a."storageKey" as primary_asset_key',
+        'a.path as primary_asset_path'
+      ])
+      .orderBy('b."createdAt"', 'DESC')
+      .limit(limit);
+
+    const results = await queryBuilder.getRawAndEntities();
+    
+    // Map the results to include primary asset information
+    const businessesWithAssets = results.entities.map((business, index) => {
+      const rawData = results.raw[index];
+      const businessDto = toObjectResponseMapper(business, BusinessWithAssetResponseDto);
+      
+      if (rawData.primary_asset_url) {
+        businessDto.urlImage = rawData.primary_asset_url;
+        const bucket = process.env.AWS_STORAGE_BUCKET || 'circuitobr116';
+        const region = process.env.AWS_STORAGE_REGION || 'us-east-1';
+        businessDto.logo = `https://${bucket}.s3.${region}.amazonaws.com/${rawData.primary_asset_url}`;
+      }
+      
+      return businessDto;
     });
 
-    let businesses: Business[];
-
-    if (promotedCount >= limit) {
-      // Return only promoted businesses in random order
-      businesses = await this.businessRepo
-        .createQueryBuilder('b')
-        .where('b.promotedAt IS NOT NULL')
-        .orderBy('RANDOM()')
-        .limit(limit)
-        .getMany();
-    } else {
-      // Return mixed results with promoted first
-      businesses = await this.businessRepo
-        .createQueryBuilder('b')
-        .addOrderBy('CASE WHEN b.promotedAt IS NOT NULL THEN 1 ELSE 0 END', 'DESC')
-        .addOrderBy('b.promotedAt', 'DESC', 'NULLS LAST')
-        .addOrderBy('b.createdAt', 'DESC')
-        .limit(limit)
-        .getMany();
-    }
-
-    return businesses.map((b) => toObjectResponseMapper(b, BusinessResponseDto));
+    return businessesWithAssets;
   }
 
   async findByLocationProximity(
@@ -263,5 +293,20 @@ export class BusinessRepository implements IBusinessRepository {
 
   async countByAccountId(accountId: number): Promise<number> {
     return await this.businessRepo.count({ where: { accountId } });
+  }
+
+  async findBusinessesWithValidPhoto(): Promise<Business[]> {
+    const businesses = await this.businessRepo
+      .createQueryBuilder('business')
+      .where('business."oldFields" ? \'originalPhoto\'')
+      .andWhere('business."oldFields"->>\'originalPhoto\' IS NOT NULL')
+      .andWhere('business."oldFields"->>\'originalPhoto\' != \'\'')
+      .andWhere('TRIM(business."oldFields"->>\'originalPhoto\') != \'\'')
+      .andWhere('business."oldFields"->>\'originalPhoto\' NOT ILIKE \'%null%\'')
+      .andWhere('business."oldFields"->>\'originalPhoto\' NOT ILIKE \'%undefined%\'')
+      .andWhere('business."oldFields"->>\'originalPhoto\' NOT ILIKE \'%n/a%\'')
+      .getMany();
+
+    return businesses.map(business => toObjectResponseMapper(business, Business));
   }
 }

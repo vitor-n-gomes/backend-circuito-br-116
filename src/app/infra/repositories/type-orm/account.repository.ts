@@ -17,16 +17,14 @@ export class AccountRepository implements IAccountRepository {
 
   async findById(id: string): Promise<AccountResponseDto | null> {
     const entity = await this.repository.findOne({
-      where: { id },
-      relations: ['asset'],
+      where: { id }
     });
     return entity ? toObjectResponseMapper(entity, AccountResponseDto) : null;
   }
 
   async findByAuthId(authId: string): Promise<AccountResponseDto | null> {
     const entity = await this.repository.findOne({
-      where: { authId },
-      relations: ['asset'],
+      where: { authId }
     });
     return entity ? toObjectResponseMapper(entity, AccountResponseDto) : null;
   }
@@ -73,7 +71,6 @@ export class AccountRepository implements IAccountRepository {
   async search(query: string, page: number, perPage: number): Promise<AccountResponseDto[]> {
     const queryBuilder = this.repository
       .createQueryBuilder('account')
-      .leftJoinAndSelect('account.asset', 'asset')
       .where('account.name ILIKE :query OR account.email ILIKE :query', { query: `%${query}%` })
       .orderBy('account.name', 'ASC')
       .skip(page * perPage)
@@ -117,8 +114,7 @@ export class AccountRepository implements IAccountRepository {
 
   async getOneWithDetails(accountId: string): Promise<AccountResponseDto | null> {
     const entity = await this.repository.findOne({
-      where: { id: accountId },
-      relations: ['asset'],
+      where: { id: accountId }
     });
     return entity ? toObjectResponseMapper(entity, AccountResponseDto) : null;
   }
@@ -185,8 +181,7 @@ export class AccountRepository implements IAccountRepository {
     await this.repository.update({ id }, updateData);
 
     const updated = await this.repository.findOne({
-      where: { id },
-      relations: ['asset'],
+      where: { id }
     });
     return toObjectResponseMapper(updated, AccountResponseDto);
   }

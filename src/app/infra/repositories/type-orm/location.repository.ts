@@ -5,6 +5,7 @@ import { Location } from './models/location.entity';
 import { ILocationRepository } from '../interfaces/location.interface.repository';
 import { LocationResponseDto } from '@/app/domain/location/dtos/responses/location.response.dto';
 import { CreateLocationDto } from '@/app/domain/location/dtos/requests/create-location.request.dto';
+import { UpdateLocationDto } from '@/app/domain/location/dtos/requests/update-location.request.dto';
 import { toObjectResponseMapper } from './mappers/to-object-response.mapper';
 
 @Injectable()
@@ -38,8 +39,27 @@ export class LocationRepository implements ILocationRepository {
       return existing;
     }
 
-    const location = this.locationRepo.create(data);
+    const now = new Date();
+    const location = this.locationRepo.create({
+      ...data,
+      createdAt: now,
+      updatedAt: now,
+    });
     const saved = await this.locationRepo.save(location);
+    return toObjectResponseMapper(saved, LocationResponseDto);
+  }
+
+  async update(id: string, data: UpdateLocationDto): Promise<LocationResponseDto> {
+    const location = await this.locationRepo.findOne({ where: { id } });
+    if (!location) {
+      return null;
+    }
+
+    const updated = this.locationRepo.merge(location, {
+      ...data,
+      updatedAt: new Date(),
+    });
+    const saved = await this.locationRepo.save(updated);
     return toObjectResponseMapper(saved, LocationResponseDto);
   }
 

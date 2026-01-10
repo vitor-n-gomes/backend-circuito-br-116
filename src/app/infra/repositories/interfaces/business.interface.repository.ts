@@ -1,8 +1,10 @@
 import { PaginationResponseDto } from '@/common/utils/dtos/responses/pagination.response.dto';
 import { FilterBusinessDto } from '../../../domain/business/dtos/requests/filter-business.request.dto';
 import { BusinessResponseDto } from '../../../domain/business/dtos/responses/business.response.dto';
+import { BusinessWithAssetResponseDto } from '../../../domain/business/dtos/responses/business-with-asset.response.dto';
 import { CreateBusinessDto } from '../../../domain/business/dtos/requests/create-business.request.dto';
 import { UpdateBusinessDto } from '../../../domain/business/dtos/requests/update-business.request.dto';
+import { Business } from '../type-orm/models/business.entity';
 
 export abstract class IBusinessRepository {
   abstract findById(id: number): Promise<BusinessResponseDto | null>;
@@ -35,7 +37,7 @@ export abstract class IBusinessRepository {
     limit: number
   ): Promise<PaginationResponseDto<BusinessResponseDto[]>>;
   
-  abstract getLatest(limit: number): Promise<BusinessResponseDto[]>;
+  abstract getLatest(limit: number): Promise<BusinessWithAssetResponseDto[]>;
   
   abstract findByLocationProximity(
     lat: number,
@@ -55,4 +57,6 @@ export abstract class IBusinessRepository {
   abstract promote(id: number): Promise<void>;
   
   abstract countByAccountId(accountId: number): Promise<number>;
+  
+  abstract findBusinessesWithValidPhoto(): Promise<Business[]>;
 }

@@ -45,6 +45,13 @@ export class BusinessController {
     private readonly incrementBusinessViewsCase: IncrementBusinessViewsCase
   ) {}
 
+  @Get('latest')
+  @ApiOperation({ summary: 'Get latest businesses' })
+  @ApiResponse({ status: 200, type: [BusinessResponseDto] })
+  async getLatest(): Promise<BusinessResponseDto[]> {
+    return await this.getLatestBusinessesCase.execute(12);
+  }
+
   @Post()
   @ApiOperation({ summary: 'Create a new business' })
   @ApiResponse({ status: 201, type: BusinessResponseDto })
@@ -77,16 +84,6 @@ export class BusinessController {
   async delete(@Param('id', ParseIntPipe) id: number): Promise<{ success: boolean }> {
     await this.deleteBusinessCase.execute(id);
     return { success: true };
-  }
-
-  @Get('latest')
-  @ApiOperation({ summary: 'Get latest businesses' })
-  @ApiQuery({ name: 'limit', required: false, type: 'number', example: 12 })
-  @ApiResponse({ status: 200, type: [BusinessResponseDto] })
-  async getLatest(
-    @Query('limit') limit?: number
-  ): Promise<BusinessResponseDto[]> {
-    return await this.getLatestBusinessesCase.execute(limit || 12);
   }
 
   @Get('search')
@@ -162,7 +159,7 @@ export class BusinessController {
     );
   }
 
-  @Get(':id')
+  @Get('details/:id')
   @ApiOperation({ summary: 'Get business by ID' })
   @ApiParam({ name: 'id', type: 'number', example: 1 })
   @ApiResponse({ status: 200, type: BusinessResponseDto })
@@ -170,7 +167,7 @@ export class BusinessController {
     return await this.findBusinessByIdCase.execute(id);
   }
 
-  @Post(':id/increment-views')
+  @Post('details/:id/increment-views')
   @HttpCode(200)
   @ApiOperation({ summary: 'Increment business view count' })
   @ApiParam({ name: 'id', type: 'number', example: 1 })

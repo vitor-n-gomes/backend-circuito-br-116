@@ -4,6 +4,8 @@ import * as request from 'supertest';
 import { AppModule } from '@/app.module';
 import { AccountFactory, createAccountEntity } from '../factories/account.factory';
 import { runFactories } from '../../factories/builder.factory';
+import { Account } from '@/app/infra/repositories/type-orm/models/account.entity';
+import { DataSource, DataSourceOptions } from 'typeorm';
 
 describe('AccountsController - Request Verification (e2e)', () => {
   let app: INestApplication;
@@ -71,10 +73,7 @@ describe('AccountsController - Request Verification (e2e)', () => {
     // Clean up test accounts
     if (testAccountId || verifiedAccountId || alreadyRequestedAccountId) {
       try {
-        const { DataSource } = require('typeorm');
-        const { Account } = require('@/app/infra/repositories/type-orm/models/account.entity');
-        
-        const dataSourceConfig = {
+        const dataSourceConfig:DataSourceOptions = {
           type: 'postgres',
           host: process.env.DB_HOST,
           port: parseInt(process.env.DB_PORT || '5432'),
