@@ -11,7 +11,6 @@ import { WorkersModule } from "./app/infra/workers/workers.module";
     }),
     InfraModule,
     DomainModule,
-    WorkersModule,
   ],
 })
 export class AppModule {}

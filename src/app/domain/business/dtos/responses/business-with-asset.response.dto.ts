@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class BusinessResponseDto {
+export class BusinessWithAssetResponseDto {
 
   @ApiProperty({ description: 'Business UUID', example: '123e4567-e89b-12d3-a456-426614174000' })
   id: string;
@@ -22,6 +22,9 @@ export class BusinessResponseDto {
 
   @ApiProperty({ description: 'Business Logo URL', example: 'https://example.com/image.jpg' })
   urlImage: string;
+
+  @ApiProperty({ description: 'Business Logo S3 URL', example: 'https://s3-bucket.amazonaws.com/path/to/logo.jpg', required: false })
+  logo: string;
 
   @ApiProperty({ description: 'Business title', example: 'Amazing Restaurant' })
   title: string;

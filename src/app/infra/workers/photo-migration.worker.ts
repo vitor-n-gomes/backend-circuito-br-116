@@ -1,4 +1,5 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 import { IBusinessRepository } from '../repositories/interfaces/business.interface.repository';
 import { IAssetRepository } from '../repositories/interfaces/asset.interface.repository';
 import { IStorageService, ExpressFile } from '../storage/interfaces/storage.interface.service';
@@ -26,6 +27,7 @@ export class PhotoMigrationWorker implements IDataMigrationWorker {
     private readonly assetRepository: IAssetRepository,
     @Inject(IStorageService)
     private readonly storageService: IStorageService,
+    private readonly dataSource: DataSource,
   ) {}
 
   getName(): string {
@@ -83,6 +85,9 @@ export class PhotoMigrationWorker implements IDataMigrationWorker {
             
             this.logger.log(`✅ [${globalIndex}/${businessesWithPhotos.length}] Successfully processed: ${business.title}`);
             
+            // Small delay after processing each photo to avoid overloading the system
+            await this.delay(500);
+            
           } catch (error) {
             result.failed++;
             const errorMsg = `Failed to process photo for ${business.title}: ${error.message}`;
@@ -94,10 +99,10 @@ export class PhotoMigrationWorker implements IDataMigrationWorker {
           }
         }
 
-        // Rate limiting between batches
+        // Rate limiting between batches (longer pause for large images)
         if (i + this.BATCH_SIZE < businessesWithPhotos.length) {
           this.logger.debug(`💤 Rate limiting pause after batch ${Math.ceil((i + this.BATCH_SIZE) / this.BATCH_SIZE)}...`);
-          await this.delay(2000);
+          await this.delay(5000); // 5 seconds between batches
         }
       }
 
@@ -126,9 +131,15 @@ export class PhotoMigrationWorker implements IDataMigrationWorker {
 
   private async getBusinessAssets(businessId: number): Promise<any[] | null> {
     try {
-      // This would need to be implemented in the repository
-      // For now, we'll assume no duplicates and let the database handle it
-      return null;
+      const query = `
+        SELECT ba."assetId", a.path, a."storageUrl"
+        FROM businesses_assets ba
+        INNER JOIN assets a ON a.aux_id = ba."assetId"
+        WHERE ba."businessId" = $1
+      `;
+      
+      const result = await this.dataSource.query(query, [businessId]);
+      return result || [];
     } catch (error) {
       this.logger.debug(`Could not check existing assets for business ${businessId}: ${error.message}`);
       return null;
@@ -171,14 +182,22 @@ export class PhotoMigrationWorker implements IDataMigrationWorker {
       // Download photo
       const photoBuffer = await this.downloadPhoto(photoUrl);
       
-      // Validate file size (max 10MB)
-      if (photoBuffer.length > 10 * 1024 * 1024) {
-        throw new Error(`File too large: ${(photoBuffer.length / 1024 / 1024).toFixed(2)}MB`);
+      const fileSizeMB = (photoBuffer.length / 1024 / 1024).toFixed(2);
+      this.logger.debug(`📏 Downloaded photo size: ${fileSizeMB}MB for ${business.title}`);
+      
+      // Validate file size (max 20MB)
+      if (photoBuffer.length > 20 * 1024 * 1024) {
+        throw new Error(`File too large: ${fileSizeMB}MB (max 20MB allowed)`);
       }
 
       // Validate minimum file size (at least 100 bytes)
       if (photoBuffer.length < 100) {
         throw new Error(`File too small: ${photoBuffer.length} bytes`);
+      }
+
+      // For large files (>20MB), add extra logging
+      if (photoBuffer.length > 20 * 1024 * 1024) {
+        this.logger.warn(`⚠️ Large file detected: ${fileSizeMB}MB for ${business.title} - processing with caution`);
       }
 
       // Create file object for storage service
@@ -209,11 +228,10 @@ export class PhotoMigrationWorker implements IDataMigrationWorker {
         storageUrl: uploadedFile.filename, // This might need adjustment based on your storage service response
       });
 
-      // Create business-asset relationship using raw query
-      // This is a temporary solution until BusinessAssetRepository is implemented
-      // await this.createBusinessAssetRelation(business.auxId, asset.id);
+      // Create business-asset relationship
+      await this.createBusinessAssetRelation(business.auxId, asset.aux_id);
 
-      this.logger.debug(`✅ Created asset ${asset.id} for business ${business.auxId} (${business.title})`);
+      this.logger.debug(`✅ Created asset ${asset.aux_id} and business-asset relationship for business ${business.auxId} (${business.title})`);
 
     } catch (error) {
       this.logger.error(`❌ Error processing photo for business ${business.title}:`, error.message);
@@ -229,8 +247,10 @@ export class PhotoMigrationWorker implements IDataMigrationWorker {
       
       const response = await axios.get(fullUrl, {
         responseType: 'arraybuffer',
-        timeout: 30000, // 30 seconds
+        timeout: 120000, // 120 seconds for large files
         maxRedirects: 5,
+        maxContentLength: 50 * 1024 * 1024, // 50MB max download
+        maxBodyLength: 50 * 1024 * 1024, // 50MB max body
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; CircuitoBR116Bot/1.0; +https://circuitobr116.com.br)',
           'Accept': 'image/*,*/*;q=0.8',
@@ -258,13 +278,22 @@ export class PhotoMigrationWorker implements IDataMigrationWorker {
         throw new Error(`Photo URL not accessible: ${photoUrl}`);
       }
       if (error.code === 'ETIMEDOUT' || error.code === 'ESOCKETTIMEDOUT') {
-        throw new Error(`Photo download timeout: ${photoUrl}`);
+        throw new Error(`Photo download timeout (likely too large): ${photoUrl}`);
+      }
+      if (error.code === 'ECONNRESET' || error.code === 'ECONNABORTED') {
+        throw new Error(`Connection reset during download (file too large): ${photoUrl}`);
+      }
+      if (error.response?.status === 400) {
+        throw new Error(`Bad request (400) - file may be too large or corrupted: ${photoUrl}`);
       }
       if (error.response?.status === 404) {
         throw new Error(`Photo not found (404): ${photoUrl}`);
       }
       if (error.response?.status === 403) {
         throw new Error(`Photo access forbidden (403): ${photoUrl}`);
+      }
+      if (error.response?.status === 413) {
+        throw new Error(`File too large (413): ${photoUrl}`);
       }
       if (error.response?.status === 500) {
         throw new Error(`Server error (500): ${photoUrl}`);
@@ -313,5 +342,38 @@ export class PhotoMigrationWorker implements IDataMigrationWorker {
 
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Creates a relationship between business and asset in the businesses_assets table
+   * Sets the first asset as primary (isPrimary = true)
+   */
+  private async createBusinessAssetRelation(businessId: number, assetId: number): Promise<void> {
+    if (this.isDryRun) {
+      this.logger.debug(`[DRY RUN] Would create business-asset relation: business ${businessId} -> asset ${assetId}`);
+      return;
+    }
+
+    try {
+      // Check if this business already has any assets
+      const existingAssets = await this.getBusinessAssets(businessId);
+      const isPrimary = !existingAssets || existingAssets.length === 0;
+
+      const query = `
+        INSERT INTO businesses_assets ("businessId", "assetId", "isPrimary", "createdAt", "updatedAt")
+        VALUES ($1, $2, $3, NOW(), NOW())
+      `;
+      
+      await this.dataSource.query(query, [businessId, assetId, isPrimary]);
+      
+      this.logger.debug(
+        `✅ Created business-asset relationship: business ${businessId} -> asset ${assetId} (isPrimary: ${isPrimary})`
+      );
+    } catch (error) {
+      this.logger.error(
+        `❌ Failed to create business-asset relationship: business ${businessId} -> asset ${assetId}: ${error.message}`
+      );
+      throw error;
+    }
   }
 }
